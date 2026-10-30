@@ -9,9 +9,7 @@ abstract: >-
   whole-transcriptome workflows.
 type: software
 version: "1.0.0"
-# The date of the annotated v1.0.0 tag. Set it on the day the tag is made,
-# and keep it in step with the tag on every release.
-date-released: "2026-10-29"
+date-released: "2026-10-30"
 license: GPL-3.0-or-later
 repository-code: "https://github.com/Adrian-I-lab/FlexiProbes"
 url: "https://github.com/Adrian-I-lab/FlexiProbes"
