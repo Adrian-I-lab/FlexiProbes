@@ -1,0 +1,75 @@
+{
+  "_comment": "Byte-identical output baseline, keyed by environment because Tm comes from primer3 and float formatting from the interpreter. Record an environment with FLEXPROBE_UPDATE_GOLDEN=1 python -m pytest tests/test_golden_output.py -- adding a new key is routine; CHANGING an existing block asserts that an output change is intended and reviewed.",
+  "environments": {
+    "py3.11+primer3-2.3.1": {
+      "flex_v1_order_csvs": {
+        "cellranger_probe_set.csv": "1602e5f9ce2b7a118a25600da3dcd28fc119c5f2e789547baad0a3ce44c79b4a",
+        "filter_report.json": "7b125c8dda20e2ecc5ce481df24608790e673b2f786e5af459318b1cdc4e7c9b",
+        "idt_opools.csv": "03a502f924648c331f07e9dd4ff11b7bcec042c149e5e6434f6f1f145c34c5f3",
+        "manifest.json": "8520a932bf547a20b530ae39c7b873001d4dba7efaf7bff4792f9994a25089cc",
+        "results.csv": "82cf84568d78ce363f640df712cf808331053de9748c7a559e7e84b07db1c3c0",
+        "run_config.json": "4fa6f80af26a355442115f24fb3d5784391535824e081deab0899a11092d2076"
+      },
+      "isoform_constitutive": {
+        "cellranger_probe_set.csv": "31e2ab9290f7d5349acbbad3e41ef372d32534f4c7642df07699ba7c95c56ee4",
+        "consensus.fa": "dbb98025586ac672a187db29b17f95164f23ecd9628679cb90716e67875a9e94",
+        "filter_report.json": "dbf75ae2519582d6e42a5967651ef2f64b723fd42732a85e29e2b771cd99d87f",
+        "idt_opools.csv": "f7193a45b83d7d022c54d568f643f7f92de2ad318343c7fa2efe698e8862f81c",
+        "manifest.json": "451e2ca43a7c7ac0350c7db5da4c99163e2d56faea91f8a48f99660d44feac90",
+        "results.csv": "ba52c8babdadbe99397417f2620aec5d229a2a116e66ab4c0f67dba048b03bb5",
+        "run_config.json": "73cbad93732ad5dbe2eb81ddfd876473aa991c3c75fba0668e4e570aaef01ea5"
+      },
+      "isoform_gene_aware": {
+        "cellranger_probe_set.csv": "bb1b22221b1dd349fcc1a4b7c99ab6186b565d2bd813f3ec454da9ef6f8572fc",
+        "filter_report.json": "76486a7aca80b5c29f7dcc2d9edf57c18816611e31da12c3c6ac6e0b059ccc95",
+        "idt_opools.csv": "bdc1fc22dc4dcef1f5dcc4cf2344425d9c2abb9a467721aea0616fe6bd94cdbd",
+        "manifest.json": "475f11a0d8b47a059dda3f3f44188fb69f42e4783f020bfe3a9649a56506dc05",
+        "results.csv": "f34c8fc1360d919adcb37535379e11ec648685dd5efe61ff54eb924020cda148",
+        "run_config.json": "615ae6298e11f0a3deb54a9b2c720f4d2b630903503077cd434b6666ae820b16"
+      },
+      "kmer_screened": {
+        "cellranger_probe_set.csv": "be9df63e63145aef53c7d249cdfadfa504cf2903bfec9bcd53789a4d0d636bfd",
+        "filter_report.json": "e17509e02929161f5b88c39beb25430d909a624521ffc627d79669f99b6bb339",
+        "idt_opools.csv": "3e16b94e0417532112bcd085407122179d9d352dc333b93abf27c26497212dc5",
+        "manifest.json": "d583c2476e3239ab99f88fc622bc784dcea7c6bb7e5f4cfac6efbb2d4c5b4e20",
+        "results.csv": "41f85788d15e35deac248e1b52094a4518a3d6b77293d7349798b6a4836adf63",
+        "run_config.json": "6bff1cfcbd47eee91dfc95eef3f9eb32fb351c252ec55184ea881fd99cdac92d"
+      },
+      "multi_strain_capped": {
+        "cellranger_probe_set.csv": "252f219c224a830c550843588e1d9b39b40843f463edd5150227d9d38e03ae8b",
+        "consensus.fa": "5fb16d2fb1da40d8e4acbdebcb4f0c7e53981123fd6e7f699246ea0a211daae4",
+        "filter_report.json": "ea1e36df8c73c4a3cd15686e167f0c64a84dc1707416fc0bc4629f7bc4249471",
+        "idt_opools.csv": "c49a86d8cfcec1b597f305cd55e60bb5a49814134e0cd797687c9b24d1a096df",
+        "manifest.json": "acf1a255de18f51be454fd41ccafa77476e340267abb314f865120192a86fa77",
+        "results.csv": "1147ecc4300324c0ad99f2d6adb31ae6d6d4c900589296ae9cb6986965f01c92",
+        "run_config.json": "95e91caea6feb98c8c1356e6fea55d92007a89dfc60428d057706057788fe7f8"
+      },
+      "multi_strain_conserved": {
+        "cellranger_probe_set.csv": "a6f00c8f7b7f0d5459731ddc1ce60b346f58c5a36d307517eace0ecc20882e8a",
+        "consensus.fa": "a433865a3644c2d33109ec85b081f826ca411d0bd4c215aa0f997266c9bde1a5",
+        "filter_report.json": "ea1e36df8c73c4a3cd15686e167f0c64a84dc1707416fc0bc4629f7bc4249471",
+        "idt_opools.csv": "305aa46e8344360393df62ecb77c77d821846c161739e623f92b2bfa875047b8",
+        "manifest.json": "d6b4a2cbfa86b359c692fa705a81938225f61cd44447f24e5380cfceb731e3b8",
+        "results.csv": "6161f61a4a034c7cf80a4b3ea93923d4f4745fdee41dda98a9ad47484dcf40d5",
+        "run_config.json": "7303a12eb8b9319a51033b6096a4db26f62dd8fd8bd340f37a0be1ae685d8be9"
+      },
+      "single_gene_v2": {
+        "cellranger_probe_set.csv": "c0ddbda251443b02a0992866b7d6e85317646a89554dbd785367cc7e28b64605",
+        "filter_report.json": "45129bdce3c9da8e4d11486946e120a57266350926a465bd2ac69d8b27693355",
+        "idt_opools.csv": "6739bc9e3054661e58bb8ab3b66a54907ab771de1f292241a8c14c8c226932ab",
+        "manifest.json": "76684c4505bbf9d97f52827a128574e0f3040546e57672fef6994b4caaac3c07",
+        "results.csv": "0643240474f9400be6a1d769d1b6a89bde131b2bba4b2013913372ed1cde4e52",
+        "run_config.json": "49b0bc14f3c41c37f0bbcdceedc4093d3f919febf28b231c911cecc6cfbe9236"
+      },
+      "strain_unique": {
+        "cellranger_probe_set.csv": "c7de869211a74b88b3822983de9a432e07b89d9a1d141bf752b601c868a28b26",
+        "consensus.fa": "3772a587e49bcc9f4c34a695631f4237afb7751591a822aa32df7d610a233f55",
+        "filter_report.json": "a072d5a996ed3498052e2f7c9c164828111c29fb9abb9bcce87e232f1b3bfb55",
+        "idt_opools.csv": "b45684108256461570d351ec2d1f9570ba1275256825a86a0422515bad192567",
+        "manifest.json": "fd97fbcae41555d9a798f3bdafb29579e9f83e9341c4f9d1ebfb388eefe69b3e",
+        "results.csv": "2532ab61f3b5a7db8eaef131d77d0be1d010317fd0991bf87f9937565ebb31dc",
+        "run_config.json": "6580594b0f60ca6dbef11cc2a05d6c1ff3091ef6a674727496468d8dfd772b9f"
+      }
+    }
+  }
+}

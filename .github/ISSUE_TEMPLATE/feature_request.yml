@@ -1,0 +1,53 @@
+name: Feature request
+description: Suggest a capability or improvement.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Suggestions are welcome. This is a small academic project and
+        maintenance is primarily corrective. A feature request may
+        sit for a long time, or be declined on capacity grounds rather than
+        merit. If you are willing to implement it yourself, say so — that
+        changes the calculation considerably.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+      description: >-
+        Describe the research task you are blocked on, not just the feature.
+        Knowing the underlying goal often surfaces a simpler answer, or one
+        that already exists.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would you like it to do?
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: What are you doing instead at the moment?
+      description: Workarounds, other tools, manual steps.
+
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Does this change probe design output?
+      options:
+        - label: >-
+            This would change which probes the tool produces for an unchanged
+            input (if so, it needs an opt-out flag that restores the previous
+            behaviour).
+
+  - type: checkboxes
+    id: contribute
+    attributes:
+      label: Contribution
+      options:
+        - label: I would be willing to work on this myself.

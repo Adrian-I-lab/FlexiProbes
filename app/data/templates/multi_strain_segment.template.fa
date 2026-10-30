@@ -1,0 +1,11 @@
+# TEMPLATE — multi-strain consensus mode.
+# ONE file per fragment/segment. Each record is the SAME fragment from a
+# DIFFERENT strain. flexprobe aligns them, builds a consensus, then designs
+# either conserved probes (bind every strain) or strain-unique probes.
+# Name the file after the fragment (e.g. OROV_L.fa, OROV_M.fa, OROV_S.fa) and
+# give each record a strain id. Keep one fragment per file; for 3 segments of
+# 2 strains you make 3 files and drag them in together (bulk mode).
+>strainA  segment label (e.g. L-segment)
+ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT
+>strainB  same segment, different strain (sequence ~same length)
+ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT

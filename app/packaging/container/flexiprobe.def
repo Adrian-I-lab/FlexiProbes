@@ -1,0 +1,110 @@
+Bootstrap: docker
+From: python:3.11-slim@sha256:da047cb8f9d1d98e5c070f5300ba9f7274e33b8fc0e5be5ed88740aed1b95ba9
+
+# flexiprobes HPC container (Apptainer / Singularity).
+#
+# Bundles the headless flexiprobes CLI + NCBI BLAST+ so the whole-transcriptome
+# pipeline can run on a cluster from an exported job bundle:
+#     flexiprobes design --config config.json
+#
+# Build (run from the app/ directory so the %files paths resolve):
+#     cd app
+#     apptainer build packaging/container/flexiprobe.sif packaging/container/flexiprobe.def
+#
+# Then point the app's "Export for HPC" form at the resulting flexiprobe.sif.
+#
+# BASE IMAGE PINNED BY DIGEST: the same
+# multi-platform index digest as the Dockerfile (test_container_pinned checks).
+# An index digest resolves to the build host's platform, so build on linux/amd64
+# (the cluster), which is the platform the vendored BLAST is compiled for.
+#
+# BLAST+ (blastn, makeblastdb, blastdbcmd) is the VENDORED 2.17.0 the desktop
+# app ships, not apt's ncbi-blast+.
+# %post checks both its bytes and its version, so a wrong binary fails the
+# build.
+
+%files
+    pyproject.toml /opt/flexiprobe-src/pyproject.toml
+    README.md /opt/flexiprobe-src/README.md
+    src /opt/flexiprobe-src/src
+    constraints.txt /opt/flexiprobe-src/constraints.txt
+    packaging/vendor/mafft/linux-x64 /opt/mafft
+    packaging/vendor/blast/linux-x64/bin /opt/blast/bin
+    packaging/container/write_build_id.py /opt/flexiprobe/write_build_id.py
+
+%post
+    set -eu
+    apt-get update
+    # libgomp1: the vendored BLAST is built with OpenMP and links libgomp,
+    # which the slim base may lack. libbz2 and zlib come with the base's
+    # Python.
+    apt-get install -y --no-install-recommends libgomp1
+    rm -rf /var/lib/apt/lists/*
+    # The exact vendored bytes, or the build fails.
+    printf '%s  %s\n' \
+        33b64bc67d3149cee2459b2f7766b363323df632cf12c099546de00aea9698b5 /opt/blast/bin/blastn \
+        c1ffdcf6f15d1d8d75377cc9f37afa42bc9fa06678903bad77c2641e60778fce /opt/blast/bin/makeblastdb \
+        7b7985134ac696b2f28428baf8a210554c4e2d6c38cc1dfdd46d207dc4cc762f /opt/blast/bin/blastdbcmd \
+      | sha256sum -c -
+    ln -s /opt/blast/bin/blastn /usr/local/bin/blastn
+    ln -s /opt/blast/bin/makeblastdb /usr/local/bin/makeblastdb
+    blastn -version | grep -q 'blastn: 2.17.0+'
+    # blastdbcmd is REQUIRED: without it the BLAST engine silently falls back
+    # to conservative counts. See the Dockerfile for the full reason.
+    ln -s /opt/blast/bin/blastdbcmd /usr/local/bin/blastdbcmd
+    blastdbcmd -version | grep -q 'blastdbcmd: 2.17.0+'
+    # -c constraints.txt PINS the runtime deps to the exact versions this
+    # release was tested against. Without it pip resolves pyproject.toml's
+    # deliberately loose ranges (e.g. primer3-py>=2.0,<3) and takes whatever
+    # is newest on the day the image is built, so two bundles built a week
+    # apart could screen with different thermodynamics. A different primer3-py
+    # release changes the golden output baselines. Constraints only CAP versions, they never add
+    # packages, so the GUI pins in the file are inert here.
+    pip install --no-cache-dir -c /opt/flexiprobe-src/constraints.txt /opt/flexiprobe-src
+    # MAFFT: the SAME vendored portable 7.526 the desktop app ships, not the
+    # distribution build from apt. Multi-strain consensus designs align their
+    # input records, and without a real MSA tool the pipeline falls back to a
+    # progressive merge that consensus.py itself documents as NOT a true
+    # multiple alignment. Installing apt's mafft would close the "no MSA tool"
+    # gap and open a worse one: a cluster run would then align with a DIFFERENT
+    # MAFFT version from a desktop run of the same input, which is the precise
+    # drift this file's constraints pin exists to prevent. 34 MB in an image
+    # that already carries BLAST+.
+    #
+    # _bundled_mafft() is frozen-app-only and returns None here, so resolution
+    # goes through _find_msa_tool("mafft") and the driver must be ON PATH. The
+    # portable package locates its helpers relative to the driver and needs no
+    # MAFFT_BINARIES, so the wrapper sets nothing; it only supplies the `bash`
+    # the driver needs, since mafft.bat is a script and not an ELF binary.
+    printf '#!/bin/sh\nexec bash /opt/mafft/mafft.bat "$@"\n' > /usr/local/bin/mafft
+    chmod 0755 /usr/local/bin/mafft
+    # Sanity check: the CLI, BLAST and MAFFT must all be callable. `set -eu` is
+    # on, so a missing tool FAILS THE BUILD rather than shipping an image that
+    # silently downgrades every multi-strain design. MAFFT writes its version
+    # to stderr and its exit status is not dependable across versions, so the
+    # streams are merged and the version string itself is what is asserted.
+    flexiprobes version
+    blastn -version
+    mafft --version 2>&1 | grep -q v7.526
+    # BUILD ID: the same script the Dockerfile runs. It
+    # also sets FLEXIPROBES_CONTAINER_BUILD_ID for every Python process.
+    python /opt/flexiprobe/write_build_id.py flexiprobe.def \
+        python:3.11-slim@sha256:da047cb8f9d1d98e5c070f5300ba9f7274e33b8fc0e5be5ed88740aed1b95ba9
+
+%environment
+    export LC_ALL=C
+    export LANG=C
+    # Visible to shells too; Python processes get it from the .pth either way.
+    export FLEXIPROBES_CONTAINER_BUILD_ID="$(cat /opt/flexiprobe/BUILD_ID 2>/dev/null)"
+
+%runscript
+    exec flexiprobes "$@"
+
+%labels
+    Application flexiprobes
+    Description Headless flexiprobes probe-design CLI with NCBI BLAST+
+
+%help
+    Run the flexiprobes pipeline from an exported HPC bundle:
+        apptainer exec --bind "$PWD" flexiprobe.sif \
+            flexiprobes design --config config.json --workers 16 --force

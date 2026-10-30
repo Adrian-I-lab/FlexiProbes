@@ -1,0 +1,83 @@
+flexiprobes — WRITTEN OFFER FOR CORRESPONDING SOURCE (GPL-3.0-or-later)
+=======================================================================
+
+This directory distributes a binary build of flexiprobes
+(macOS, Windows or Linux, version @FLEXIPROBES_VERSION@).
+
+NOTE FOR READERS OF THE SOURCE TREE: in the repository this file is a template
+and the line above reads "@FLEXIPROBES_VERSION@" literally. The PyInstaller
+spec (packaging/flexprobe.spec) substitutes flexprobe.__version__ at build time,
+so the copy inside any actual binary names the version that binary was built
+from. Do not hand-edit the version here.
+
+flexiprobes is free software, licensed under the GNU General Public License,
+version 3 or (at your option) any later version. The full license text and the
+third-party component breakdown ship inside the application bundle at
+  flexiprobes.app/Contents/Resources/licenses/     (macOS .app)
+  flexiprobes/_internal/licenses/                  (Windows / Linux onedir)
+containing LICENSE, NOTICE, SOURCE-OFFER.txt and THIRD-PARTY-LICENSES/, and
+they accompany the source described below.
+
+  SOURCE CODE:  https://github.com/Adrian-I-lab/FlexiProbes
+
+
+HOW TO GET THE COMPLETE CORRESPONDING SOURCE
+--------------------------------------------
+1) Included with this distribution (GPLv3 §6(a)) — the primary route:
+   The complete corresponding source for this binary is provided alongside it,
+   in the `app/` directory of the same flexiprobes distribution this file came
+   from (`app/src/`, `app/pyproject.toml`, `app/packaging/`, etc.). Build
+   instructions are in `app/README.md` ("Package a desktop binary"). The exact
+   dependency versions this binary was built against are pinned in
+   `app/constraints.txt`.
+
+2) From the public source repository (GPLv3 §6(d)):
+       https://github.com/Adrian-I-lab/FlexiProbes
+   The complete corresponding source is hosted there at no charge. Released
+   versions are published on that repository's Releases page. If you cannot
+   identify the revision corresponding to the version named above, file an
+   issue on the repository or use the written offer below, and you will be
+   directed to it.
+
+3) Written offer (GPLv3 §6(b)), as a fallback:
+   For a period of THREE (3) YEARS from the date you received this binary, the
+   copyright holder will provide, to anyone who possesses this object code, a
+   complete machine-readable copy of the corresponding source code under the
+   terms of the GPL-3.0-or-later, at no more than the cost of distribution — or
+   by directing you to the repository above, where it is available free.
+   Reference "flexiprobes @FLEXIPROBES_VERSION@ corresponding source".
+
+
+WHAT "CORRESPONDING SOURCE" INCLUDES
+------------------------------------
+All flexiprobes source (engine, CLI, and PySide6 GUI), the packaging scripts and
+PyInstaller spec used to build this binary, and the build/installation scripts.
+
+Bundled third-party components keep their own licenses. Their full license texts
+ship inside the bundle under licenses/THIRD-PARTY-LICENSES/; see also the NOTICE
+file. Source for the copylefted ones:
+  - PySide6 / Qt   — used under its GPL-3.0 option; Qt source is available from
+                     The Qt Company / https://download.qt.io/ , and PySide6
+                     source from https://pypi.org/project/PySide6/
+  - primer3-py     — GPL-2.0-or-later (this is the component whose copyleft the
+                     whole app inherits); source at
+                     https://pypi.org/project/primer3-py/ and
+                     https://github.com/libnano/primer3-py
+  - NCBI BLAST+    — public domain (US Government work); the bundled blastn,
+                     makeblastdb and blastdbcmd come from
+                     https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.17.0/
+  - NumPy, Biopython — BSD / BSD-style; from PyPI.
+  - MAFFT          — BSD; source at https://mafft.cbrc.jp/alignment/software/
+  - MSYS2 tools    — Windows build only: the GPL and LGPL programs and
+                     libraries inside MAFFT's Windows package (bash,
+                     coreutils, grep, sed and others). They are unmodified
+                     MSYS2 binaries. Source is at
+                     https://github.com/msys2/MSYS2-packages and
+                     https://repo.msys2.org/msys/sources/ ; the full list
+                     with versions is THIRD-PARTY-LICENSES/msys2-README.txt.
+The exact versions of all of the above are recorded in `app/constraints.txt`
+within the corresponding source.
+
+NO WARRANTY. This is research software, distributed WITHOUT ANY WARRANTY; it is
+NOT a medical device and is not validated for diagnostic or clinical use. See
+the GNU General Public License (LICENSE) for details.

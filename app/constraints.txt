@@ -1,0 +1,42 @@
+# Reproducible-install constraints — the exact runtime dependency versions this
+# release was tested against (Python 3.11–3.12, CI matrix). Use to pin a known-good
+# environment without changing the flexible ranges in pyproject.toml:
+#
+#   pip install -e ".[gui]" -c constraints.txt
+#
+# PYTHON FLOOR. numpy 2.4.6 below declares
+# `Requires-Python: >=3.11`, and there are no environment markers here, so this
+# file does not resolve on 3.10. The floor is ">=3.11" in pyproject.toml and
+# the CI matrix, and the `lockfile` job in .github/workflows/ci.yml installs
+# with `-c constraints.txt`, so a pin that breaks the floor is a red build.
+#
+# WHY NO --generate-hashes. pip's hash checking is all-or-nothing: once any
+# requirement carries a hash, `--require-hashes` applies to the whole install,
+# and it refuses editable/local-directory requirements outright — which kills
+# the `pip install -e ".[gui]" -c constraints.txt` form this file exists to
+# support, and every build and CI job that uses it. Hashes are also per-wheel,
+# so a macOS-arm64 / Windows-x64 / Linux-x64 build matrix needs the union of
+# three platforms' wheels for PySide6, numpy and primer3-py, which a
+# hand-curated `pip freeze | grep` cannot produce correctly. The prerequisite
+# is switching to a real resolver-generated lockfile (pip-compile or uv lock)
+# for a non-editable install path; until then hashes would cost correctness,
+# not buy it. Supply-chain pinning here is by exact version, which is what the
+# vendored licence texts (packaging/vendor_licenses.py) are checked against.
+#
+# Regenerate after a validated dependency bump (from an installed, tested venv):
+#   pip freeze | grep -iE '^(biopython|numpy|openpyxl|primer3-py|PySide6|shiboken6|et-xmlfile)=='
+#
+# Core (headless pipeline)
+biopython==1.87
+numpy==2.4.6
+openpyxl==3.1.5
+# primer3-py sets every Tm, so its version changes output. The app, the
+# container recipes, ci.yml's drift pin and the recorded golden baseline
+# (app/tests/golden/baseline.json) all use this same version. Bump them
+# together, never one alone.
+primer3-py==2.3.1
+# — transitive —
+et-xmlfile==2.0.0
+# GUI extra (optional; only needed for flexprobe-gui)
+PySide6==6.11.1
+shiboken6==6.11.1
