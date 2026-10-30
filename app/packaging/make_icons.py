@@ -15,7 +15,6 @@ Usage:
 """
 from __future__ import annotations
 
-import math
 import os
 import struct
 import subprocess
@@ -27,7 +26,7 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from PySide6.QtCore import QBuffer, QByteArray, QIODevice, QPointF, Qt  # noqa: E402
 from PySide6.QtGui import (  # noqa: E402
-    QBrush, QColor, QImage, QLinearGradient, QPainter, QPainterPath, QPen,
+    QBrush, QColor, QImage, QPainter, QPainterPath, QPen,
 )
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
@@ -36,64 +35,38 @@ ICO_SIZES = (16, 32, 48, 64, 128, 256)
 ICNS_SIZES = (16, 32, 64, 128, 256, 512, 1024)
 
 
+# Logo geometry on a 100-unit canvas, y pointing down. Two bent arms are the
+# halves of a split probe; the gap between them is the ligation site.
+NAVY, WHITE, CYAN = "#0B3C5D", "#FFFFFF", "#00AEEF"
+ARM_WIDTH = 12
+LEFT_ARM = ((8.4, 37.68), (24.0, 53.28), (38.8, 53.28))
+RIGHT_ARM = ((61.2, 53.28), (76.0, 53.28), (91.6, 37.68))
+
+
 def render_master(size: int = MASTER) -> QImage:
-    """Draw a DNA double-helix on a gradient rounded square."""
+    """Draw the flexiprobes logo: a white and a cyan probe half on a navy rounded square."""
     img = QImage(size, size, QImage.Format.Format_ARGB32_Premultiplied)
     img.fill(Qt.GlobalColor.transparent)
     p = QPainter(img)
     p.setRenderHint(QPainter.RenderHint.Antialiasing, True)
+    unit = size / 100.0
 
-    # Rounded-square background with a teal→indigo gradient.
-    grad = QLinearGradient(0, 0, size, size)
-    grad.setColorAt(0.0, QColor("#14b8a6"))
-    grad.setColorAt(1.0, QColor("#4f46e5"))
     radius = size * 0.22
     bg = QPainterPath()
     bg.addRoundedRect(0, 0, size, size, radius, radius)
-    p.fillPath(bg, QBrush(grad))
+    p.fillPath(bg, QBrush(QColor(NAVY)))
 
-    # Double helix.
-    cx = size / 2.0
-    amp = size * 0.17
-    top, bottom = size * 0.2, size * 0.8
-    span = bottom - top
-    turns = 2.5
-    n = 240
-
-    def strand(phase: float) -> QPainterPath:
+    for points, colour in ((LEFT_ARM, WHITE), (RIGHT_ARM, CYAN)):
+        pen = QPen(QColor(colour))
+        pen.setWidthF(ARM_WIDTH * unit)
+        pen.setCapStyle(Qt.PenCapStyle.RoundCap)
+        pen.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
+        p.setPen(pen)
         path = QPainterPath()
-        for i in range(n + 1):
-            frac = i / n
-            y = top + frac * span
-            ang = frac * turns * 2 * math.pi + phase
-            x = cx + amp * math.sin(ang)
-            if i == 0:
-                path.moveTo(QPointF(x, y))
-            else:
-                path.lineTo(QPointF(x, y))
-        return path
-
-    white = QColor(255, 255, 255)
-    rung_pen = QPen(QColor(255, 255, 255, 150))
-    rung_pen.setWidthF(size * 0.022)
-    rung_pen.setCapStyle(Qt.PenCapStyle.RoundCap)
-    p.setPen(rung_pen)
-    rungs = 11
-    for j in range(1, rungs):
-        frac = j / rungs
-        y = top + frac * span
-        ang = frac * turns * 2 * math.pi
-        xa = cx + amp * math.sin(ang)
-        xb = cx - amp * math.sin(ang)
-        p.drawLine(QPointF(xa, y), QPointF(xb, y))
-
-    strand_pen = QPen(white)
-    strand_pen.setWidthF(size * 0.055)
-    strand_pen.setCapStyle(Qt.PenCapStyle.RoundCap)
-    strand_pen.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
-    p.setPen(strand_pen)
-    p.drawPath(strand(0.0))
-    p.drawPath(strand(math.pi))
+        path.moveTo(QPointF(points[0][0] * unit, points[0][1] * unit))
+        for x, y in points[1:]:
+            path.lineTo(QPointF(x * unit, y * unit))
+        p.drawPath(path)
 
     p.end()
     return img
