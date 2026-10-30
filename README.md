@@ -16,7 +16,7 @@ exports orderable IDT oPool and Cell Ranger probe-set CSVs.
 > **Cite this repository** on GitHub.
 
 Requires Python **3.11 or newer** to run from source. The desktop binaries
-bundle their own Python and need nothing installed. App was developed by
+bundle their own Python and need nothing installed. 
 
 ## Install the desktop app
 
@@ -102,6 +102,9 @@ FlexiProbes/
 ## Citing FlexiProbes
 
 See [`CITATION.cff`](CITATION.cff), or use **Cite this repository** on GitHub.
+
+The Flexiprobes app was developed by Adrian Ilich and collaborators at the Systems 
+Virology Lab, QIMR Bergohfer.
 
 ## Licence
 
