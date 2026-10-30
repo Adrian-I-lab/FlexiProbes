@@ -103,8 +103,8 @@ FlexiProbes/
 
 See [`CITATION.cff`](CITATION.cff), or use **Cite this repository** on GitHub.
 
-The Flexiprobes app was developed by Adrian Ilich and collaborators at the Systems 
-Virology Lab, QIMR Bergohfer.
+The FlexiProbes app was developed by Adrian Ilich and collaborators at the Systems 
+Virology Lab, QIMR Berghofer.
 
 ## Licence
 
