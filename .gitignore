@@ -12,6 +12,10 @@ env/
 .coverage
 htmlcov/
 
+# R
+.Rhistory
+.RData 
+
 # Build outputs. Release binaries are attached to the GitHub Release.
 build/
 dist/
