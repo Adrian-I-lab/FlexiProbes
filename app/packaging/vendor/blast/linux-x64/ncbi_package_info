@@ -1,0 +1,413 @@
+PACKAGE_NAME: blast
+PACKAGE_VERSION: 2.17.0
+PACKAGE_SIGNATURE: GCC_1320-ReleaseMT64--x86_64-unknown-linux4.18.0-gnu2.28-coremake12
+PACKAGE_CONFIG: Linux64-Alma : gcc : ./c++/compilers/unix/GCC.sh --with-static --without-dll --with-bin-release --with-strip --without-debug --without-pcre --with-mt --with-openmp --with-flat-makefile --with-experimental=Int8GI --without-gnutls --without-gcrypt --with-vdb=/panfs/traces01.be-md.ncbi.nlm.nih.gov/trace_software/vdb --with-static-vdb --with-build-root-sfx=--Linux64-Alma-gcc --with-flat-makefile --with-ncbi-public --without-ccache --without-caution --without-runpath --without-makefile-auto-update --with-projects=scripts/projects/blast/project.lst --with-internal
+
+>>>>>  blastp
+
+blastp: 2.17.0+
+ Package: blast 2.17.0, build Jul  1 2025 08:59:18
+ Package-Config:  Linux64-Alma : gcc : ./c++/compilers/unix/GCC.sh --with-static --without-dll --with-bin-release --with-strip --without-debug --without-pcre --with-mt --with-openmp --with-flat-makefile --with-experimental=Int8GI --without-gnutls --without-gcrypt --with-vdb=/panfs/traces01.be-md.ncbi.nlm.nih.gov/trace_software/vdb --with-static-vdb --with-build-root-sfx=--Linux64-Alma-gcc --with-flat-makefile --with-ncbi-public --without-ccache --without-caution --without-runpath --without-makefile-auto-update --with-projects=scripts/projects/blast/project.lst --with-internal
+ Build-Signature:  GCC_1320-ReleaseMT64--x86_64-unknown-linux4.18.0-gnu2.28-coremake12
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 09:22:31
+ Revision:  699180
+ Subversion-Revision:  699180
+ Stable-Components-Version:  29
+ Production-Version:  20250122
+ Built-As:  blastp
+
+
+
+>>>>>  blastn
+
+blastn: 2.17.0+
+ Package: blast 2.17.0, build Jul  1 2025 08:59:18
+ Package-Config:  Linux64-Alma : gcc : ./c++/compilers/unix/GCC.sh --with-static --without-dll --with-bin-release --with-strip --without-debug --without-pcre --with-mt --with-openmp --with-flat-makefile --with-experimental=Int8GI --without-gnutls --without-gcrypt --with-vdb=/panfs/traces01.be-md.ncbi.nlm.nih.gov/trace_software/vdb --with-static-vdb --with-build-root-sfx=--Linux64-Alma-gcc --with-flat-makefile --with-ncbi-public --without-ccache --without-caution --without-runpath --without-makefile-auto-update --with-projects=scripts/projects/blast/project.lst --with-internal
+ Build-Signature:  GCC_1320-ReleaseMT64--x86_64-unknown-linux4.18.0-gnu2.28-coremake12
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 09:22:11
+ Revision:  699180
+ Subversion-Revision:  699180
+ Stable-Components-Version:  29
+ Production-Version:  20250122
+ Built-As:  blastn
+
+
+
+>>>>>  blastx
+
+blastx: 2.17.0+
+ Package: blast 2.17.0, build Jul  1 2025 08:59:18
+ Package-Config:  Linux64-Alma : gcc : ./c++/compilers/unix/GCC.sh --with-static --without-dll --with-bin-release --with-strip --without-debug --without-pcre --with-mt --with-openmp --with-flat-makefile --with-experimental=Int8GI --without-gnutls --without-gcrypt --with-vdb=/panfs/traces01.be-md.ncbi.nlm.nih.gov/trace_software/vdb --with-static-vdb --with-build-root-sfx=--Linux64-Alma-gcc --with-flat-makefile --with-ncbi-public --without-ccache --without-caution --without-runpath --without-makefile-auto-update --with-projects=scripts/projects/blast/project.lst --with-internal
+ Build-Signature:  GCC_1320-ReleaseMT64--x86_64-unknown-linux4.18.0-gnu2.28-coremake12
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 09:22:34
+ Revision:  699180
+ Subversion-Revision:  699180
+ Stable-Components-Version:  29
+ Production-Version:  20250122
+ Built-As:  blastx
+
+
+
+>>>>>  tblastn
+
+tblastn: 2.17.0+
+ Package: blast 2.17.0, build Jul  1 2025 08:59:18
+ Package-Config:  Linux64-Alma : gcc : ./c++/compilers/unix/GCC.sh --with-static --without-dll --with-bin-release --with-strip --without-debug --without-pcre --with-mt --with-openmp --with-flat-makefile --with-experimental=Int8GI --without-gnutls --without-gcrypt --with-vdb=/panfs/traces01.be-md.ncbi.nlm.nih.gov/trace_software/vdb --with-static-vdb --with-build-root-sfx=--Linux64-Alma-gcc --with-flat-makefile --with-ncbi-public --without-ccache --without-caution --without-runpath --without-makefile-auto-update --with-projects=scripts/projects/blast/project.lst --with-internal
+ Build-Signature:  GCC_1320-ReleaseMT64--x86_64-unknown-linux4.18.0-gnu2.28-coremake12
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 09:25:15
+ Revision:  699180
+ Subversion-Revision:  699180
+ Stable-Components-Version:  29
+ Production-Version:  20250122
+ Built-As:  tblastn
+
+
+
+>>>>>  tblastx
+
+tblastx: 2.17.0+
+ Package: blast 2.17.0, build Jul  1 2025 08:59:18
+ Package-Config:  Linux64-Alma : gcc : ./c++/compilers/unix/GCC.sh --with-static --without-dll --with-bin-release --with-strip --without-debug --without-pcre --with-mt --with-openmp --with-flat-makefile --with-experimental=Int8GI --without-gnutls --without-gcrypt --with-vdb=/panfs/traces01.be-md.ncbi.nlm.nih.gov/trace_software/vdb --with-static-vdb --with-build-root-sfx=--Linux64-Alma-gcc --with-flat-makefile --with-ncbi-public --without-ccache --without-caution --without-runpath --without-makefile-auto-update --with-projects=scripts/projects/blast/project.lst --with-internal
+ Build-Signature:  GCC_1320-ReleaseMT64--x86_64-unknown-linux4.18.0-gnu2.28-coremake12
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 09:25:10
+ Revision:  699180
+ Subversion-Revision:  699180
+ Stable-Components-Version:  29
+ Production-Version:  20250122
+ Built-As:  tblastx
+
+
+
+>>>>>  psiblast
+
+psiblast: 2.17.0+
+ Package: blast 2.17.0, build Jul  1 2025 08:59:18
+ Package-Config:  Linux64-Alma : gcc : ./c++/compilers/unix/GCC.sh --with-static --without-dll --with-bin-release --with-strip --without-debug --without-pcre --with-mt --with-openmp --with-flat-makefile --with-experimental=Int8GI --without-gnutls --without-gcrypt --with-vdb=/panfs/traces01.be-md.ncbi.nlm.nih.gov/trace_software/vdb --with-static-vdb --with-build-root-sfx=--Linux64-Alma-gcc --with-flat-makefile --with-ncbi-public --without-ccache --without-caution --without-runpath --without-makefile-auto-update --with-projects=scripts/projects/blast/project.lst --with-internal
+ Build-Signature:  GCC_1320-ReleaseMT64--x86_64-unknown-linux4.18.0-gnu2.28-coremake12
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 09:23:36
+ Revision:  699180
+ Subversion-Revision:  699180
+ Stable-Components-Version:  29
+ Production-Version:  20250122
+ Built-As:  psiblast
+
+
+
+>>>>>  rpsblast
+
+rpsblast: 2.17.0+
+ Package: blast 2.17.0, build Jul  1 2025 08:59:18
+ Package-Config:  Linux64-Alma : gcc : ./c++/compilers/unix/GCC.sh --with-static --without-dll --with-bin-release --with-strip --without-debug --without-pcre --with-mt --with-openmp --with-flat-makefile --with-experimental=Int8GI --without-gnutls --without-gcrypt --with-vdb=/panfs/traces01.be-md.ncbi.nlm.nih.gov/trace_software/vdb --with-static-vdb --with-build-root-sfx=--Linux64-Alma-gcc --with-flat-makefile --with-ncbi-public --without-ccache --without-caution --without-runpath --without-makefile-auto-update --with-projects=scripts/projects/blast/project.lst --with-internal
+ Build-Signature:  GCC_1320-ReleaseMT64--x86_64-unknown-linux4.18.0-gnu2.28-coremake12
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 09:24:26
+ Revision:  699180
+ Subversion-Revision:  699180
+ Stable-Components-Version:  29
+ Production-Version:  20250122
+ Built-As:  rpsblast
+
+
+
+>>>>>  rpstblastn
+
+rpstblastn: 2.17.0+
+ Package: blast 2.17.0, build Jul  1 2025 08:59:18
+ Package-Config:  Linux64-Alma : gcc : ./c++/compilers/unix/GCC.sh --with-static --without-dll --with-bin-release --with-strip --without-debug --without-pcre --with-mt --with-openmp --with-flat-makefile --with-experimental=Int8GI --without-gnutls --without-gcrypt --with-vdb=/panfs/traces01.be-md.ncbi.nlm.nih.gov/trace_software/vdb --with-static-vdb --with-build-root-sfx=--Linux64-Alma-gcc --with-flat-makefile --with-ncbi-public --without-ccache --without-caution --without-runpath --without-makefile-auto-update --with-projects=scripts/projects/blast/project.lst --with-internal
+ Build-Signature:  GCC_1320-ReleaseMT64--x86_64-unknown-linux4.18.0-gnu2.28-coremake12
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 09:24:29
+ Revision:  699180
+ Subversion-Revision:  699180
+ Stable-Components-Version:  29
+ Production-Version:  20250122
+ Built-As:  rpstblastn
+
+
+
+>>>>>  makembindex
+
+makembindex: 2.17.0
+ Package: blast 2.17.0, build Jul  1 2025 08:59:18
+ Package-Config:  Linux64-Alma : gcc : ./c++/compilers/unix/GCC.sh --with-static --without-dll --with-bin-release --with-strip --without-debug --without-pcre --with-mt --with-openmp --with-flat-makefile --with-experimental=Int8GI --without-gnutls --without-gcrypt --with-vdb=/panfs/traces01.be-md.ncbi.nlm.nih.gov/trace_software/vdb --with-static-vdb --with-build-root-sfx=--Linux64-Alma-gcc --with-flat-makefile --with-ncbi-public --without-ccache --without-caution --without-runpath --without-makefile-auto-update --with-projects=scripts/projects/blast/project.lst --with-internal
+ Build-Signature:  GCC_1320-ReleaseMT64--x86_64-unknown-linux4.18.0-gnu2.28-coremake12
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 09:23:12
+ Revision:  699180
+ Subversion-Revision:  699180
+ Stable-Components-Version:  29
+ Production-Version:  20250122
+ Built-As:  makembindex
+
+ NCBI C++ Toolkit: 29.0.699180
+   Build-Date:  Jul  1 2025 08:58:06
+   Build-ID:  4883cdde-a6b6-4b36-9f4a-332453f2f039
+   Revision:  699180
+   Subversion-Revision:  699180
+   Stable-Components-Version:  29
+   Production-Version:  20250122
+
+
+
+
+>>>>>  segmasker
+
+segmasker: 1.0.0
+ Package: blast 2.17.0, build Jul  1 2025 08:59:18
+ Package-Config:  Linux64-Alma : gcc : ./c++/compilers/unix/GCC.sh --with-static --without-dll --with-bin-release --with-strip --without-debug --without-pcre --with-mt --with-openmp --with-flat-makefile --with-experimental=Int8GI --without-gnutls --without-gcrypt --with-vdb=/panfs/traces01.be-md.ncbi.nlm.nih.gov/trace_software/vdb --with-static-vdb --with-build-root-sfx=--Linux64-Alma-gcc --with-flat-makefile --with-ncbi-public --without-ccache --without-caution --without-runpath --without-makefile-auto-update --with-projects=scripts/projects/blast/project.lst --with-internal
+ Build-Signature:  GCC_1320-ReleaseMT64--x86_64-unknown-linux4.18.0-gnu2.28-coremake12
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 09:24:34
+ Revision:  699180
+ Subversion-Revision:  699180
+ Stable-Components-Version:  29
+ Production-Version:  20250122
+ Built-As:  segmasker
+
+
+
+>>>>>  dustmasker
+
+dustmasker: 1.0.0
+ Package: blast 2.17.0, build Jul  1 2025 08:59:18
+ Package-Config:  Linux64-Alma : gcc : ./c++/compilers/unix/GCC.sh --with-static --without-dll --with-bin-release --with-strip --without-debug --without-pcre --with-mt --with-openmp --with-flat-makefile --with-experimental=Int8GI --without-gnutls --without-gcrypt --with-vdb=/panfs/traces01.be-md.ncbi.nlm.nih.gov/trace_software/vdb --with-static-vdb --with-build-root-sfx=--Linux64-Alma-gcc --with-flat-makefile --with-ncbi-public --without-ccache --without-caution --without-runpath --without-makefile-auto-update --with-projects=scripts/projects/blast/project.lst --with-internal
+ Build-Signature:  GCC_1320-ReleaseMT64--x86_64-unknown-linux4.18.0-gnu2.28-coremake12
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 09:22:46
+ Revision:  699180
+ Subversion-Revision:  699180
+ Stable-Components-Version:  29
+ Production-Version:  20250122
+ Built-As:  dustmasker
+
+
+
+>>>>>  windowmasker
+
+windowmasker: 1.0.0
+ Package: blast 2.17.0, build Jul  1 2025 08:59:18
+ Package-Config:  Linux64-Alma : gcc : ./c++/compilers/unix/GCC.sh --with-static --without-dll --with-bin-release --with-strip --without-debug --without-pcre --with-mt --with-openmp --with-flat-makefile --with-experimental=Int8GI --without-gnutls --without-gcrypt --with-vdb=/panfs/traces01.be-md.ncbi.nlm.nih.gov/trace_software/vdb --with-static-vdb --with-build-root-sfx=--Linux64-Alma-gcc --with-flat-makefile --with-ncbi-public --without-ccache --without-caution --without-runpath --without-makefile-auto-update --with-projects=scripts/projects/blast/project.lst --with-internal
+ Build-Signature:  GCC_1320-ReleaseMT64--x86_64-unknown-linux4.18.0-gnu2.28-coremake12
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 09:25:40
+ Revision:  699180
+ Subversion-Revision:  699180
+ Stable-Components-Version:  29
+ Production-Version:  20250122
+ Built-As:  windowmasker
+
+ window-masker-algorithm:1.0.0
+
+ windowmasker-statistics-algorithm-version:1.0.0
+
+ windowmasker-statistics-format-version:ascii 1.1.0
+
+ windowmasker-statistics-format-version:binary 1.1.0
+
+ windowmasker-statistics-format-version:oascii 1.1.0
+
+ windowmasker-statistics-format-version:obinary 1.1.0
+
+
+
+>>>>>  deltablast
+
+deltablast: 2.17.0+
+ Package: blast 2.17.0, build Jul  1 2025 08:59:18
+ Package-Config:  Linux64-Alma : gcc : ./c++/compilers/unix/GCC.sh --with-static --without-dll --with-bin-release --with-strip --without-debug --without-pcre --with-mt --with-openmp --with-flat-makefile --with-experimental=Int8GI --without-gnutls --without-gcrypt --with-vdb=/panfs/traces01.be-md.ncbi.nlm.nih.gov/trace_software/vdb --with-static-vdb --with-build-root-sfx=--Linux64-Alma-gcc --with-flat-makefile --with-ncbi-public --without-ccache --without-caution --without-runpath --without-makefile-auto-update --with-projects=scripts/projects/blast/project.lst --with-internal
+ Build-Signature:  GCC_1320-ReleaseMT64--x86_64-unknown-linux4.18.0-gnu2.28-coremake12
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 09:22:44
+ Revision:  699180
+ Subversion-Revision:  699180
+ Stable-Components-Version:  29
+ Production-Version:  20250122
+ Built-As:  deltablast
+
+
+
+>>>>>  makeblastdb
+
+makeblastdb: 2.17.0+
+ Package: blast 2.17.0, build Jul  1 2025 08:59:18
+ Package-Config:  Linux64-Alma : gcc : ./c++/compilers/unix/GCC.sh --with-static --without-dll --with-bin-release --with-strip --without-debug --without-pcre --with-mt --with-openmp --with-flat-makefile --with-experimental=Int8GI --without-gnutls --without-gcrypt --with-vdb=/panfs/traces01.be-md.ncbi.nlm.nih.gov/trace_software/vdb --with-static-vdb --with-build-root-sfx=--Linux64-Alma-gcc --with-flat-makefile --with-ncbi-public --without-ccache --without-caution --without-runpath --without-makefile-auto-update --with-projects=scripts/projects/blast/project.lst --with-internal
+ Build-Signature:  GCC_1320-ReleaseMT64--x86_64-unknown-linux4.18.0-gnu2.28-coremake12
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 09:23:03
+ Revision:  699180
+ Subversion-Revision:  699180
+ Stable-Components-Version:  29
+ Production-Version:  20250122
+ Built-As:  makeblastdb
+
+
+
+>>>>>  blastdbcmd
+
+blastdbcmd: 2.17.0+
+ Package: blast 2.17.0, build Jul  1 2025 08:59:18
+ Package-Config:  Linux64-Alma : gcc : ./c++/compilers/unix/GCC.sh --with-static --without-dll --with-bin-release --with-strip --without-debug --without-pcre --with-mt --with-openmp --with-flat-makefile --with-experimental=Int8GI --without-gnutls --without-gcrypt --with-vdb=/panfs/traces01.be-md.ncbi.nlm.nih.gov/trace_software/vdb --with-static-vdb --with-build-root-sfx=--Linux64-Alma-gcc --with-flat-makefile --with-ncbi-public --without-ccache --without-caution --without-runpath --without-makefile-auto-update --with-projects=scripts/projects/blast/project.lst --with-internal
+ Build-Signature:  GCC_1320-ReleaseMT64--x86_64-unknown-linux4.18.0-gnu2.28-coremake12
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 09:21:44
+ Revision:  699180
+ Subversion-Revision:  699180
+ Stable-Components-Version:  29
+ Production-Version:  20250122
+ Built-As:  blastdbcmd
+
+
+
+>>>>>  blastdb_aliastool
+
+blastdb_aliastool: 2.17.0+
+ Package: blast 2.17.0, build Jul  1 2025 08:59:18
+ Package-Config:  Linux64-Alma : gcc : ./c++/compilers/unix/GCC.sh --with-static --without-dll --with-bin-release --with-strip --without-debug --without-pcre --with-mt --with-openmp --with-flat-makefile --with-experimental=Int8GI --without-gnutls --without-gcrypt --with-vdb=/panfs/traces01.be-md.ncbi.nlm.nih.gov/trace_software/vdb --with-static-vdb --with-build-root-sfx=--Linux64-Alma-gcc --with-flat-makefile --with-ncbi-public --without-ccache --without-caution --without-runpath --without-makefile-auto-update --with-projects=scripts/projects/blast/project.lst --with-internal
+ Build-Signature:  GCC_1320-ReleaseMT64--x86_64-unknown-linux4.18.0-gnu2.28-coremake12
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 09:21:33
+ Revision:  699180
+ Subversion-Revision:  699180
+ Stable-Components-Version:  29
+ Production-Version:  20250122
+ Built-As:  blastdb_aliastool
+
+
+
+>>>>>  convert2blastmask
+
+convert2blastmask: 2.17.0+
+ Package: blast 2.17.0, build Jul  1 2025 08:59:18
+ Package-Config:  Linux64-Alma : gcc : ./c++/compilers/unix/GCC.sh --with-static --without-dll --with-bin-release --with-strip --without-debug --without-pcre --with-mt --with-openmp --with-flat-makefile --with-experimental=Int8GI --without-gnutls --without-gcrypt --with-vdb=/panfs/traces01.be-md.ncbi.nlm.nih.gov/trace_software/vdb --with-static-vdb --with-build-root-sfx=--Linux64-Alma-gcc --with-flat-makefile --with-ncbi-public --without-ccache --without-caution --without-runpath --without-makefile-auto-update --with-projects=scripts/projects/blast/project.lst --with-internal
+ Build-Signature:  GCC_1320-ReleaseMT64--x86_64-unknown-linux4.18.0-gnu2.28-coremake12
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 09:22:40
+ Revision:  699180
+ Subversion-Revision:  699180
+ Stable-Components-Version:  29
+ Production-Version:  20250122
+ Built-As:  convert2blastmask
+
+
+
+>>>>>  blastdbcheck
+
+blastdbcheck: 2.17.0+
+ Package: blast 2.17.0, build Jul  1 2025 08:59:18
+ Package-Config:  Linux64-Alma : gcc : ./c++/compilers/unix/GCC.sh --with-static --without-dll --with-bin-release --with-strip --without-debug --without-pcre --with-mt --with-openmp --with-flat-makefile --with-experimental=Int8GI --without-gnutls --without-gcrypt --with-vdb=/panfs/traces01.be-md.ncbi.nlm.nih.gov/trace_software/vdb --with-static-vdb --with-build-root-sfx=--Linux64-Alma-gcc --with-flat-makefile --with-ncbi-public --without-ccache --without-caution --without-runpath --without-makefile-auto-update --with-projects=scripts/projects/blast/project.lst --with-internal
+ Build-Signature:  GCC_1320-ReleaseMT64--x86_64-unknown-linux4.18.0-gnu2.28-coremake12
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 09:21:43
+ Revision:  699180
+ Subversion-Revision:  699180
+ Stable-Components-Version:  29
+ Production-Version:  20250122
+ Built-As:  blastdbcheck
+
+
+
+>>>>>  makeprofiledb
+
+makeprofiledb: 2.17.0+
+ Package: blast 2.17.0, build Jul  1 2025 08:59:18
+ Package-Config:  Linux64-Alma : gcc : ./c++/compilers/unix/GCC.sh --with-static --without-dll --with-bin-release --with-strip --without-debug --without-pcre --with-mt --with-openmp --with-flat-makefile --with-experimental=Int8GI --without-gnutls --without-gcrypt --with-vdb=/panfs/traces01.be-md.ncbi.nlm.nih.gov/trace_software/vdb --with-static-vdb --with-build-root-sfx=--Linux64-Alma-gcc --with-flat-makefile --with-ncbi-public --without-ccache --without-caution --without-runpath --without-makefile-auto-update --with-projects=scripts/projects/blast/project.lst --with-internal
+ Build-Signature:  GCC_1320-ReleaseMT64--x86_64-unknown-linux4.18.0-gnu2.28-coremake12
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 09:23:12
+ Revision:  699180
+ Subversion-Revision:  699180
+ Stable-Components-Version:  29
+ Production-Version:  20250122
+ Built-As:  makeprofiledb
+
+
+
+>>>>>  blast_formatter
+
+blast_formatter: 2.17.0+
+ Package: blast 2.17.0, build Jul  1 2025 08:59:18
+ Package-Config:  Linux64-Alma : gcc : ./c++/compilers/unix/GCC.sh --with-static --without-dll --with-bin-release --with-strip --without-debug --without-pcre --with-mt --with-openmp --with-flat-makefile --with-experimental=Int8GI --without-gnutls --without-gcrypt --with-vdb=/panfs/traces01.be-md.ncbi.nlm.nih.gov/trace_software/vdb --with-static-vdb --with-build-root-sfx=--Linux64-Alma-gcc --with-flat-makefile --with-ncbi-public --without-ccache --without-caution --without-runpath --without-makefile-auto-update --with-projects=scripts/projects/blast/project.lst --with-internal
+ Build-Signature:  GCC_1320-ReleaseMT64--x86_64-unknown-linux4.18.0-gnu2.28-coremake12
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 09:20:59
+ Revision:  699180
+ Subversion-Revision:  699180
+ Stable-Components-Version:  29
+ Production-Version:  20250122
+ Built-As:  blast_formatter
+
+
+
+>>>>>  blastn_vdb
+
+blastn_vdb: 2.17.0+
+ncbi-vdb: 3.2.1
+ Package: blast 2.17.0, build Jul  1 2025 08:59:18
+ Package-Config:  Linux64-Alma : gcc : ./c++/compilers/unix/GCC.sh --with-static --without-dll --with-bin-release --with-strip --without-debug --without-pcre --with-mt --with-openmp --with-flat-makefile --with-experimental=Int8GI --without-gnutls --without-gcrypt --with-vdb=/panfs/traces01.be-md.ncbi.nlm.nih.gov/trace_software/vdb --with-static-vdb --with-build-root-sfx=--Linux64-Alma-gcc --with-flat-makefile --with-ncbi-public --without-ccache --without-caution --without-runpath --without-makefile-auto-update --with-projects=scripts/projects/blast/project.lst --with-internal
+ Build-Signature:  GCC_1320-ReleaseMT64--x86_64-unknown-linux4.18.0-gnu2.28-coremake12
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 09:22:14
+ Revision:  699180
+ Subversion-Revision:  699180
+ Stable-Components-Version:  29
+ Production-Version:  20250122
+ Built-As:  blastn_vdb
+
+
+
+>>>>>  tblastn_vdb
+
+tblastn_vdb: 2.17.0+
+ncbi-vdb: 3.2.1
+ Package: blast 2.17.0, build Jul  1 2025 08:59:18
+ Package-Config:  Linux64-Alma : gcc : ./c++/compilers/unix/GCC.sh --with-static --without-dll --with-bin-release --with-strip --without-debug --without-pcre --with-mt --with-openmp --with-flat-makefile --with-experimental=Int8GI --without-gnutls --without-gcrypt --with-vdb=/panfs/traces01.be-md.ncbi.nlm.nih.gov/trace_software/vdb --with-static-vdb --with-build-root-sfx=--Linux64-Alma-gcc --with-flat-makefile --with-ncbi-public --without-ccache --without-caution --without-runpath --without-makefile-auto-update --with-projects=scripts/projects/blast/project.lst --with-internal
+ Build-Signature:  GCC_1320-ReleaseMT64--x86_64-unknown-linux4.18.0-gnu2.28-coremake12
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 09:25:06
+ Revision:  699180
+ Subversion-Revision:  699180
+ Stable-Components-Version:  29
+ Production-Version:  20250122
+ Built-As:  tblastn_vdb
+
+
+
+>>>>>  blast_formatter_vdb
+
+blast_formatter_vdb: 2.17.0+
+ Package: blast 2.17.0, build Jul  1 2025 08:59:18
+ Package-Config:  Linux64-Alma : gcc : ./c++/compilers/unix/GCC.sh --with-static --without-dll --with-bin-release --with-strip --without-debug --without-pcre --with-mt --with-openmp --with-flat-makefile --with-experimental=Int8GI --without-gnutls --without-gcrypt --with-vdb=/panfs/traces01.be-md.ncbi.nlm.nih.gov/trace_software/vdb --with-static-vdb --with-build-root-sfx=--Linux64-Alma-gcc --with-flat-makefile --with-ncbi-public --without-ccache --without-caution --without-runpath --without-makefile-auto-update --with-projects=scripts/projects/blast/project.lst --with-internal
+ Build-Signature:  GCC_1320-ReleaseMT64--x86_64-unknown-linux4.18.0-gnu2.28-coremake12
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 09:21:24
+ Revision:  699180
+ Subversion-Revision:  699180
+ Stable-Components-Version:  29
+ Production-Version:  20250122
+ Built-As:  blast_formatter_vdb
+
+
+
+>>>>>  blast_vdb_cmd
+
+blast_vdb_cmd: 2.17.0+
+ Package: blast 2.17.0, build Jul  1 2025 08:59:18
+ Package-Config:  Linux64-Alma : gcc : ./c++/compilers/unix/GCC.sh --with-static --without-dll --with-bin-release --with-strip --without-debug --without-pcre --with-mt --with-openmp --with-flat-makefile --with-experimental=Int8GI --without-gnutls --without-gcrypt --with-vdb=/panfs/traces01.be-md.ncbi.nlm.nih.gov/trace_software/vdb --with-static-vdb --with-build-root-sfx=--Linux64-Alma-gcc --with-flat-makefile --with-ncbi-public --without-ccache --without-caution --without-runpath --without-makefile-auto-update --with-projects=scripts/projects/blast/project.lst --with-internal
+ Build-Signature:  GCC_1320-ReleaseMT64--x86_64-unknown-linux4.18.0-gnu2.28-coremake12
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 09:21:27
+ Revision:  699180
+ Subversion-Revision:  699180
+ Stable-Components-Version:  29
+ Production-Version:  20250122
+ Built-As:  blast_vdb_cmd
+
+
+
+
