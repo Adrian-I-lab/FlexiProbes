@@ -5,8 +5,6 @@
   </picture>
 </p>
 
-# FlexiProbes
-
 FlexiProbes is a custom probe design tool for
 **10x Genomics Flex v1 / Flex v2 / Visium spatial**. FlexiProbes takes a target
 FASTA, tiles it, filters and off-target-screens the candidates, ranks them, and
@@ -18,7 +16,7 @@ exports orderable IDT oPool and Cell Ranger probe-set CSVs.
 > **Cite this repository** on GitHub.
 
 Requires Python **3.11 or newer** to run from source. The desktop binaries
-bundle their own Python and need nothing installed.
+bundle their own Python and need nothing installed. App was developed by
 
 ## Install the desktop app
 
