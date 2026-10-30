@@ -28,13 +28,6 @@ pytestmark = pytest.mark.skipif(
 STATUS_COL = 5
 
 
-@pytest.fixture(scope="module")
-def qapp():
-    from PySide6.QtWidgets import QApplication
-    app = QApplication.instance() or QApplication([])
-    yield app
-
-
 def _rows_by_name(win):
     return {win.table.item(r, 2).text(): r for r in range(win.table.rowCount())}
 

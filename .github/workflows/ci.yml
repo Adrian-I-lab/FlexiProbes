@@ -5,20 +5,22 @@ name: CI
 # caught before merge.
 #
 # Tags are included so that pushing v* runs the gates, produces the release
-# binaries AND publishes them. The build-* jobs compile on every run but only
-# UPLOAD on a tag (see the Upload artifact steps — that gating is what keeps
-# the 500 MB artifact storage allowance from filling), and the `release` job at
-# the bottom turns a tag's artifacts into a GitHub Release with checksums, so
+# binaries AND publishes them. The build-* jobs run only on a v* tag or a
+# manual run (Actions tab, "Run workflow"), and upload only on a tag, which
+# keeps the 500 MB artifact storage allowance from filling. Start a manual run
+# before tagging whenever packaging/ has changed. The `release` job at the
+# bottom turns a tag's artifacts into a GitHub Release with checksums, so
 # `git push --tags` is the whole publication path.
 #
 # Job map:
-#   test      matrix gates (pytest + coverage floor, pyflakes, mypy) across
-#             the supported Python range
-#   lockfile  installs constraints.txt and checks it is internally consistent,
-#             then runs the suite and the licence-vendoring check against the
-#             pinned versions a release is actually built from
-#   build-*   one binary per platform, each verified for what PyInstaller
-#             really collected before it is archived
+#   test      matrix gates (pyflakes, mypy, pytest) on 3.11 and 3.12. The 3.11
+#             leg installs constraints.txt, the pinned versions a release is
+#             built from, and measures coverage. The 3.12 leg installs the
+#             flexible ranges, to catch dependency drift.
+#   lockfile  checks constraints.txt is internally consistent and installable
+#             on the floor, and that the vendored licence texts are current
+#   build-*   tags and manual runs only: one binary per platform, each verified
+#             for what PyInstaller really collected before it is archived
 #   release   tags only: downloads the three archives, writes SHA256SUMS,
 #             creates the GitHub Release
 
@@ -27,6 +29,7 @@ on:
     branches: [main, master]
     tags: ["v*"]
   pull_request:
+  workflow_dispatch:
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -35,6 +38,7 @@ concurrency:
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
@@ -51,15 +55,30 @@ jobs:
       # under app/src. actions/checkout defaults to a shallow clone with NO
       # TAGS. In that clone the test finds no tag, has nothing to compare
       # against, and passes without checking anything.
+      #
+      # The sparse checkout leaves out the macOS and Windows vendored binaries
+      # (about 240 MB). Nothing on a Linux runner reads them, and
+      # filter: blob:none means their contents are never downloaded.
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/app/packaging/vendor/blast/macos-arm64/
+            !/app/packaging/vendor/blast/windows-x64/
+            !/app/packaging/vendor/mafft/macos/
+            !/app/packaging/vendor/mafft/windows-x64/
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
+          cache-dependency-path: |
+            app/pyproject.toml
+            app/constraints.txt
 
       # PySide6 wheels bundle Qt itself but link against system graphics and
       # xcb libraries, which the ubuntu runner image does not ship. Without
@@ -82,26 +101,34 @@ jobs:
       # index can address. Without it here the BLAST path is untested in
       # automation: the real-blastn resume and end-to-end tests skip, and the
       # run stays green while the fallback breaks.
-      - name: Install BLAST+ (exercises the fallback engine)
+      # MAFFT is installed so the MAFFT arm of tests/test_aligner_parity.py
+      # runs instead of skipping. This is the distribution build; the desktop
+      # binaries bundle the portable package from packaging/vendor/mafft.
+      - name: Install BLAST+ (exercises the fallback engine) and MAFFT
         run: |
-          sudo apt-get install -y --no-install-recommends ncbi-blast+
+          sudo apt-get install -y --no-install-recommends ncbi-blast+ mafft
           blastn -version
+          mafft --version
 
-      # DELIBERATELY UNPINNED, apart from primer3-py. This job installs the
-      # flexible ranges on purpose, to catch dependency drift. See the
-      # `lockfile` job's comment. primer3-py is the one exception because
-      # tests/golden/baseline.json is keyed on its version (py3.11+primer3-X),
-      # so an upstream bump lands as "no golden block recorded for ...", a
-      # missing baseline, not an output change. It would fail the golden tests,
-      # skip every build-* job via `needs: test`, and block a release. Pinning
-      # every dependency here would avoid that only by deleting the drift
-      # detector. Bump this ONLY together with constraints.txt and a recorded
+      # 3.11 installs constraints.txt: the exact versions a release is built
+      # from, so this leg proves that combination works.
+      #
+      # 3.12 is DELIBERATELY UNPINNED, apart from primer3-py. It installs the
+      # flexible ranges on purpose, to catch dependency drift. primer3-py is
+      # the one exception because tests/golden/baseline.json is keyed on its
+      # version (py3.11+primer3-X), so an upstream bump would land as "no
+      # golden block recorded for ...", a missing baseline, not an output
+      # change. Bump it ONLY together with constraints.txt and a recorded
       # baseline block for the new version, never on its own.
       - name: Install (core + GUI + dev)
         working-directory: app
         run: |
           python -m pip install --upgrade pip
-          pip install -e ".[gui,dev]" "primer3-py==2.3.1"
+          if [ "${{ matrix.python-version }}" = "3.11" ]; then
+            pip install -e ".[gui,dev]" -c constraints.txt
+          else
+            pip install -e ".[gui,dev]" "primer3-py==2.3.1"
+          fi
 
       - name: Lint (pyflakes)
         working-directory: app
@@ -142,52 +169,44 @@ jobs:
           # env var. Do not copy the 3.11 block across by hand. A fabricated
           # baseline gates nothing and hides a real float-formatting change.
           FLEXPROBE_GOLDEN_OPTIONAL: ${{ matrix.python-version == '3.12' && '1' || '0' }}
-        # Coverage. The floor is a measured value rounded down, not an
-        # aspiration: line coverage over src/flexprobe + src/flexprobe_gui on
-        # Python 3.11, rounded down to 80%. The small headroom is deliberate.
-        # The point is to catch a slide, not to be a target. RAISE it when the
-        # measured number moves up. Never lower it to make a red build pass.
-        # A deleted test or a module that stopped being exercised is exactly
-        # what this is here to report.
+        # The full suite, including the `slow` exhaustive ground-truth oracle
+        # tests, which take about 15 s.
         #
-        # Measured on the default (non-slow) selection, which is what runs
-        # here; the `-m slow` step below is a handful of oracle tests and is
-        # deliberately left un-instrumented (it would measure ~nothing and
-        # trip the floor).
+        # Coverage, on the 3.11 leg only: the 3.12 leg would measure the same
+        # code again for about 25 s more. The floor is a measured value rounded
+        # down, not an aspiration: line + branch coverage over src/flexprobe +
+        # src/flexprobe_gui on Python 3.11 (84% measured locally on
+        # 2026-10-30), rounded down to 80%. The small
+        # headroom is deliberate. The point is to catch a slide, not to be a
+        # target. RAISE it when the measured number moves up. Never lower it
+        # to make a red build pass. A deleted test or a module that stopped
+        # being exercised is exactly what this is here to report.
         run: >-
           python -m pytest -q
-          --cov=src/flexprobe
-          --cov=src/flexprobe_gui
-          --cov-report=term-missing:skip-covered
-          --cov-fail-under=80
-
-      # `-m 'not slow'` in addopts (pyproject.toml) deselects these from the
-      # step above. They are the exhaustive ground-truth oracle tests — the
-      # only check that compares the specificity screen against ground truth
-      # rather than against itself (see the `slow` marker's comment in
-      # pyproject.toml). They take seconds, so there is no reason to leave
-      # them out of CI.
-      - name: Tests (slow — exhaustive ground-truth oracle)
-        working-directory: app
-        env:
-          QT_QPA_PLATFORM: offscreen
-        run: python -m pytest -q -m slow
+          ${{ matrix.python-version == '3.11' && '--cov=src/flexprobe --cov=src/flexprobe_gui --cov-branch --cov-report=term-missing:skip-covered --cov-fail-under=80' || '' }}
 
 
   lockfile:
     # constraints.txt is documented as the way to "reproduce a release build".
-    # A lockfile nobody installs is a claim, not a lock, so this job installs
-    # it on the declared floor interpreter.
+    # A lockfile nobody installs is a claim, not a lock. The test job's 3.11
+    # leg installs it and runs the suite on it; this job checks the lockfile
+    # itself: every pin took, every pin installs on the declared floor.
     #
-    # It is also the ONLY place `vendor_licenses.py --check` can run honestly:
-    # that script rebuilds each vendored licence text from the *installed*
-    # distribution and stamps the version into the file header, so in the `test`
-    # job above — which installs the flexible ranges on purpose, to catch dep
-    # drift — every text would read "stale" the first time a dependency
-    # released a patch. Pinned environment, meaningful check.
+    # It is also where `vendor_licenses.py --check` runs: that script rebuilds
+    # each vendored licence text from the *installed* distribution and stamps
+    # the version into the file header, so it needs the pinned environment.
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
+      # No vendored binaries are needed here at all.
       - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/app/packaging/vendor/blast/*/
+            !/app/packaging/vendor/mafft/*/
 
       # The declared floor. If constraints.txt ever again pins something this
       # interpreter cannot install, the pip step below fails here rather than
@@ -196,20 +215,9 @@ jobs:
         with:
           python-version: "3.11"
           cache: pip
-
-      # Same Qt runtime libraries as the test job — see the comment there.
-      - name: Install Qt system libraries
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
-            libegl1 libgl1 libxkbcommon-x11-0 libdbus-1-3 libxcb-cursor0 \
-            libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 \
-            libxcb-render-util0 libxcb-shape0 libxcb-xinerama0 libxcb-xfixes0
-
-      - name: Install BLAST+ (exercises the fallback engine)
-        run: |
-          sudo apt-get install -y --no-install-recommends ncbi-blast+
-          blastn -version
+          cache-dependency-path: |
+            app/pyproject.toml
+            app/constraints.txt
 
       - name: Install from the lockfile (-c constraints.txt)
         working-directory: app
@@ -308,19 +316,12 @@ jobs:
         working-directory: app
         run: python packaging/vendor_licenses.py --check
 
-      # Run the suite against the pinned versions too. The matrix job proves the
-      # code survives dependency drift; this proves the exact combination a
-      # release is built from actually works.
-      - name: Tests (pinned environment)
-        working-directory: app
-        env:
-          QT_QPA_PLATFORM: offscreen
-        run: python -m pytest -q
-
   build-macos:
     # Build the macOS .app (PyInstaller is host-specific — must run on macOS).
     runs-on: macos-14
     needs: test
+    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
+    timeout-minutes: 60
     # Code signing and notarisation (optional).
     #
     # Add these six repository secrets (Settings -> Secrets and variables ->
@@ -387,7 +388,7 @@ jobs:
           python -m pip install --upgrade pip
           # -c constraints.txt: these three jobs produce the binaries the
           # `release` job publishes, so they are built from the same pinned
-          # set the `lockfile` job proves installs and passes. pyinstaller
+          # set the test job's 3.11 leg installs and passes. pyinstaller
           # is not in the file, so it resolves freely.
           pip install -e ".[gui]" pyinstaller -c constraints.txt
           python packaging/build.py --clean
@@ -412,9 +413,9 @@ jobs:
       # a runnable .app (the launcher, the vendored blastn and every Qt
       # framework symlink arrive broken). `ditto -c -k --keepParent
       # --sequesterRsrc` is Apple's own bundle-preserving archiver.
-      # Deliberately NOT tag-gated: it costs no artifact storage, and running
-      # it on every push is what keeps the release path from being first
-      # exercised on the day of a release.
+      # Not tag-gated: it costs no artifact storage, and running it on a
+      # manual run too means the release path can be exercised before the
+      # day of a release.
       - name: Package the .app
         run: |
           ditto -c -k --sequesterRsrc --keepParent \
@@ -441,9 +442,8 @@ jobs:
 
       # Tags only. One run's binaries are ~480 MB across the three platforms,
       # close to a 500 MB artifact storage allowance. Uploading on every push
-      # would fill it, and then every build job would fail at upload. The
-      # build above still runs on every push, so a compile break is caught.
-      # Only the storage-consuming step is gated.
+      # would fill it, and then every build job would fail at upload. A
+      # manual run still builds and verifies everything without uploading.
       - name: Upload artifact
         if: startsWith(github.ref, 'refs/tags/v')
         uses: actions/upload-artifact@v4
@@ -458,6 +458,8 @@ jobs:
     # can't cross-compile, so this must run on a Windows host.
     runs-on: windows-latest
     needs: test
+    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -470,7 +472,7 @@ jobs:
           python -m pip install --upgrade pip
           # -c constraints.txt: these three jobs produce the binaries the
           # `release` job publishes, so they are built from the same pinned
-          # set the `lockfile` job proves installs and passes. pyinstaller
+          # set the test job's 3.11 leg installs and passes. pyinstaller
           # is not in the file, so it resolves freely.
           pip install -e ".[gui]" pyinstaller -c constraints.txt
           python packaging/build.py --clean
@@ -514,6 +516,8 @@ jobs:
     # Build the Linux binary (onedir flexiprobes/ with the flexiprobes launcher).
     runs-on: ubuntu-latest
     needs: test
+    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -526,7 +530,7 @@ jobs:
           python -m pip install --upgrade pip
           # -c constraints.txt: these three jobs produce the binaries the
           # `release` job publishes, so they are built from the same pinned
-          # set the `lockfile` job proves installs and passes. pyinstaller
+          # set the test job's 3.11 leg installs and passes. pyinstaller
           # is not in the file, so it resolves freely.
           pip install -e ".[gui]" pyinstaller -c constraints.txt
           python packaging/build.py --clean
@@ -574,6 +578,7 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/v')
     needs: [test, lockfile, build-macos, build-windows, build-linux]
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       # Least privilege: the default GITHUB_TOKEN is read-only for contents,
       # and creating a release needs write. Nothing else is granted, and this

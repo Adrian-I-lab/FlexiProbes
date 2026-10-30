@@ -23,13 +23,6 @@ UNIT_TEXTS = ("isoforms (0 = all)", "per 25 nt half (0 = identical everywhere)",
               "bp (≥5 matches the 10x off-target threshold)")
 
 
-@pytest.fixture(scope="module")
-def qapp():
-    from PySide6.QtWidgets import QApplication
-    app = QApplication.instance() or QApplication([])
-    yield app
-
-
 @pytest.fixture()
 def dlg(qapp, tmp_path, monkeypatch):
     monkeypatch.setenv("FLEXPROBE_HOME", str(tmp_path))

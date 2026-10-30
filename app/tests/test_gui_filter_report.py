@@ -16,13 +16,6 @@ import pytest
 pytest.importorskip("PySide6")
 
 
-@pytest.fixture(scope="module")
-def qapp():
-    from PySide6.QtWidgets import QApplication
-    app = QApplication.instance() or QApplication([])
-    yield app
-
-
 def _dialog(tmp_path, counts, thresholds=None):
     from flexprobe_gui.filter_report_dialog import FilterReportDialog
     (tmp_path / "filter_report.json").write_text(json.dumps({

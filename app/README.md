@@ -279,19 +279,19 @@ at 56 °C in the Flex assay". If you know your buffer, adjust `TM_MV_CONC` …
 pytest            # the default suite; headless, no BLAST required.
                   # GUI tests auto-skip if PySide6 is absent; primer3
                   # Tm/dimer tests skip if primer3 is absent.
-pytest -m slow    # the slow exhaustive ground-truth oracle tests
+pytest -m slow    # only the exhaustive ground-truth oracle tests
 ```
 
-`addopts = -m 'not slow'` in `pyproject.toml` deselects the `slow` tests
-from a plain `pytest` run. They are the only check that compares the specificity
-screen against ground truth rather than against itself. They take seconds, and CI
-runs them as a separate step, so run them too if you touch the specificity
-path.
+The `slow` tests are the only check that compares the specificity screen
+against ground truth rather than against itself. They take about 15 s and run
+as part of a plain `pytest`. `pytest -m "not slow"` leaves them out.
 
-CI (the repository root's `.github/workflows/ci.yml`) runs pytest + `pytest -m
-slow` + mypy + pyflakes across the Python matrix, and builds the macOS
-`.app`, the Windows `.exe` and the Linux binary (`build-macos`,
-`build-windows`, `build-linux`). On a `v*` tag push the binaries are uploaded, and the `release` job
+CI (the repository root's `.github/workflows/ci.yml`) runs pytest, mypy and
+pyflakes on Python 3.11 and 3.12 for every push and pull request. The 3.11 leg
+installs the pinned versions in `constraints.txt` and measures coverage. The
+macOS `.app`, the Windows `.exe` and the Linux binary (`build-macos`,
+`build-windows`, `build-linux`) are built on a `v*` tag push, or when the
+workflow is started by hand from the Actions tab. On a tag the `release` job
 publishes them, with a `SHA256SUMS` file, as a GitHub Release.
 
 ## Package a desktop binary

@@ -83,9 +83,10 @@ def test_kmer_run_never_claims_to_be_blast(tmp_path):
 @pytest.mark.parametrize("engine,word", [(ENGINE_KMER, "k-mer chunk"),
                                          (ENGINE_BLAST, "BLAST chunk")])
 def test_chunk_lines_name_the_engine(tmp_path, engine, word):
-    # query_chunk=1 forces more than one chunk, which is what gates the per
-    # chunk progress line.
-    _, recs = _run(tmp_path, engine, query_chunk=1)
+    # More than one chunk is what gates the per-chunk progress line. GENES
+    # yields 26 candidates, so query_chunk=13 makes exactly two chunks: one
+    # blastn call per chunk, not one per candidate as query_chunk=1 did.
+    _, recs = _run(tmp_path, engine, query_chunk=13)
     chunks = [r["msg"] for r in recs if "chunk" in r["msg"]]
-    assert chunks, "no per-chunk progress lines were emitted"
+    assert len(chunks) >= 2, f"expected several chunk lines, got {chunks}"
     assert all(m.startswith(word) for m in chunks), chunks

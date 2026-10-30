@@ -8,22 +8,26 @@ from flexprobe.filters import apply_filters
 from flexprobe.io_fasta import parse_fasta
 from flexprobe.models import FilterThresholds, ProbeCandidate
 
-# safe_tm delegates to primer3.calc_tm and is designed to return NaN when
-# primer3 is unavailable (it's an optional Tm-scoring path, off by default).
-# Skip the "real Tm value" assertions when primer3 isn't installed so the
-# headless suite passes in a minimal environment; the NaN-fallback behaviour is
-# still covered by test_safe_tm_ambiguous_is_nan.
+# safe_tm delegates to primer3.calc_tm and returns NaN when primer3 cannot be
+# imported. primer3-py is a required dependency, so that only happens in a
+# broken environment. Skip the "real Tm value" assertions there rather than
+# fail the whole module; the NaN-fallback behaviour is still covered by
+# test_safe_tm_ambiguous_is_nan.
 _HAS_PRIMER3 = importlib.util.find_spec("primer3") is not None
 requires_primer3 = pytest.mark.skipif(
-    not _HAS_PRIMER3, reason="primer3 not installed (optional Tm scoring)"
+    not _HAS_PRIMER3, reason="primer3 not importable (required dependency)"
 )
 
 
 @requires_primer3
 def test_safe_tm_clean_sequence():
+    # 61.538 °C with primer3-py 2.3.1, the version constraints.txt pins. The
+    # 0.5 °C tolerance absorbs rounding differences between primer3-py 2.x
+    # releases (the unpinned CI leg) but not a change to the Tm model or its
+    # salt and oligo concentrations, which moves this sequence by degrees.
     v = safe_tm("CACTGCCACTGTCGGTTAGTTTAAT")
     assert not is_nan(v)
-    assert 50 < v < 75
+    assert v == pytest.approx(61.538, abs=0.5)
 
 
 @requires_primer3

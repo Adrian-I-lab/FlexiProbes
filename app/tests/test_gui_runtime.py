@@ -16,13 +16,6 @@ pytestmark = pytest.mark.skipif(
 )
 
 
-@pytest.fixture(scope="module")
-def qapp():
-    from PySide6.QtWidgets import QApplication
-    app = QApplication.instance() or QApplication([])
-    yield app
-
-
 # --- column registry --------------------------------------------------------
 
 def test_column_registry_select_and_headers(qapp):

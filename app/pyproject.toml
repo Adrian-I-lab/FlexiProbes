@@ -70,15 +70,17 @@ flexprobe_gui = ["assets/*.png"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 # `slow` marks the exhaustive-oracle checks: they build a q-gram index over a
-# reference and verify every candidate offset by full-length comparison, which
-# is far slower than the rest of the suite but is the only check that compares
-# the specificity screen against ground truth rather than against itself.
-# Deselected by default (`-m "not slow"` below); CI and anyone touching the
-# specificity path should run `pytest -m slow`.
+# reference and verify every candidate offset by full-length comparison. They
+# are the only check that compares the specificity screen against ground truth
+# rather than against itself. They take about 15 s, so they run by default;
+# `pytest -m slow` runs them alone and `pytest -m "not slow"` leaves them out.
 markers = [
-    "slow: exhaustive correctness oracle; deselected by default",
+    "slow: exhaustive correctness oracle (about 15 s)",
 ]
-addopts = "-m 'not slow'"
+# --strict-markers turns a mistyped marker into an error instead of a silent
+# no-op, and xfail_strict makes an unexpectedly passing xfail fail the run.
+addopts = "--strict-markers"
+xfail_strict = true
 
 [tool.mypy]
 # Covers BOTH the core library and the GUI package.

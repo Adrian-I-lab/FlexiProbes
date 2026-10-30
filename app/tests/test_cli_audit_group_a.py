@@ -1,7 +1,8 @@
-"""CLI help text, group A: each flag's help states what the code does.
+"""CLI help text: each flag's help states what the code does.
+
 Each check pins the current fact and, where one existed, the absence of an
-inaccurate older wording. The spacing-ladder flags are covered by
-test_cli_audit_group_b.py.
+inaccurate older wording. The spacing-ladder flags, and flags whose behaviour
+is checked as well as their help, are in test_cli_audit_group_b.py.
 """
 import pytest
 
@@ -27,7 +28,8 @@ def _help_of_option(option, command="design"):
 
 
 CASES = [
-    # (id, option, command, must contain, must not contain)
+    # (audit id, option, command, must contain, must not contain).
+    # The audit id is only a cross-reference; the test id is the option.
     ("A2", "--no-off-target-same-subject", "design", "17.6%", "17.7%"),
     ("A3", "--no-resume", "design", ".candidate_cache", "resumable BLAST"),
     ("A4", "--screen-top-per-gene", "design", "either engine", "Cuts BLAST"),
@@ -58,7 +60,7 @@ CASES = [
 
 
 @pytest.mark.parametrize("cid,option,command,present,absent", CASES,
-                         ids=[c[0] for c in CASES])
+                         ids=[f"{c[2]} {c[1]}" for c in CASES])
 def test_help_is_corrected(cid, option, command, present, absent):
     text = _help_of_option(option, command)
     assert present in text, (cid, text)
@@ -66,20 +68,13 @@ def test_help_is_corrected(cid, option, command, present, absent):
         assert absent not in text, (cid, text)
 
 
-def test_a1_top_level_description():
+def test_top_level_description():
     d = cli.build_parser().description
     assert "BLAST" not in d.split("(")[1] or "k-mer" in d
     assert "off-target screen" in d
 
 
-def test_a28_export_hpc_description():
+def test_export_hpc_description():
     d = " ".join(_sub("export-hpc").description.split())
     assert "README.txt" in d and "--split-prepare-screen" in d
 
-
-def test_a20_the_runtime_warning_names_the_real_flag():
-    import inspect
-    import flexprobe.pipeline as pl
-    src = inspect.getsource(pl)
-    assert "or pass --blast-db to enable" not in src
-    assert '"--off-target-ref to enable real off-target screening."' in src
