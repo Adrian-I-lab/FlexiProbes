@@ -1,5 +1,6 @@
 """Pytest fixtures + path setup for the flexprobe test suite."""
 import pathlib
+import shutil
 import sys
 
 import pytest
@@ -52,6 +53,33 @@ def _isolated_flexprobe_home(tmp_path, monkeypatch):
     ``FLEXPROBE_HOME`` itself, same as before.
     """
     monkeypatch.setenv("FLEXPROBE_HOME", str(tmp_path / ".flexprobe_home"))
+
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    """Record each phase's report on the item for ``_discard_passing_tmp_path``."""
+    outcome = yield
+    report = outcome.get_result()
+    setattr(item, f"_rep_{report.when}", report)
+
+
+@pytest.fixture(autouse=True)
+def _discard_passing_tmp_path(request, tmp_path):
+    """Delete a test's ``tmp_path`` as soon as the test passes.
+
+    pytest keeps every ``tmp_path`` until the session ends, and keeps the last
+    three sessions on disk. Every test here gets one (see
+    ``_isolated_flexprobe_home``), and any test that builds a k=12 k-mer index
+    writes a fixed 128 MiB offsets array into it, whatever the reference size.
+    Left alone, one run of the default selection leaves about 11 GB behind,
+    which is enough to fill a GitHub-hosted runner. A failed or errored test
+    keeps its directory so it can still be inspected.
+    """
+    yield
+    setup = getattr(request.node, "_rep_setup", None)
+    call = getattr(request.node, "_rep_call", None)
+    if setup is not None and setup.passed and call is not None and call.passed:
+        shutil.rmtree(tmp_path, ignore_errors=True)
 
 
 @pytest.fixture
