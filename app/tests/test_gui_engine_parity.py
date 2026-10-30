@@ -42,13 +42,6 @@ from flexprobe.constants import TN_MODE_OFF, TN_MODE_SOFT, TN_MODE_STRICT_A
 from flexprobe.models import FilterThresholds, RunConfig
 
 
-@pytest.fixture(scope="module")
-def qapp():
-    from PySide6.QtWidgets import QApplication
-    app = QApplication.instance() or QApplication([])
-    yield app
-
-
 @pytest.fixture()
 def dialog(qapp, tmp_path):
     from flexprobe_gui.new_query_dialog import NewQueryDialog

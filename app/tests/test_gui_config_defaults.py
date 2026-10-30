@@ -99,13 +99,6 @@ def test_the_only_cross_modality_differences_are_chemistry_facts():
 # config_summary -> draft: "Re-run" must rebuild the design it shows
 # ---------------------------------------------------------------------------
 
-@pytest.fixture(scope="module")
-def qapp():
-    from PySide6.QtWidgets import QApplication
-    app = QApplication.instance() or QApplication([])
-    yield app
-
-
 @pytest.fixture()
 def dialog(qapp, tmp_path):
     from flexprobe_gui.new_query_dialog import NewQueryDialog

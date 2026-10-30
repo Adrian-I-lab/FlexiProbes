@@ -17,13 +17,6 @@ pytestmark = pytest.mark.skipif(
 )
 
 
-@pytest.fixture(scope="module")
-def qapp():
-    from PySide6.QtWidgets import QApplication
-    app = QApplication.instance() or QApplication([])
-    yield app
-
-
 def _opens_at_least_its_size_hint(dlg, qapp):
     dlg.show()
     qapp.processEvents()

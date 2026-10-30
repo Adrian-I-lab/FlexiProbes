@@ -82,6 +82,13 @@ def _discard_passing_tmp_path(request, tmp_path):
         shutil.rmtree(tmp_path, ignore_errors=True)
 
 
+@pytest.fixture(scope="session")
+def qapp():
+    """The one QApplication for every GUI test. Qt allows only one per process."""
+    from PySide6.QtWidgets import QApplication
+    return QApplication.instance() or QApplication([])
+
+
 @pytest.fixture
 def fixtures_dir() -> pathlib.Path:
     return pathlib.Path(__file__).parent / "fixtures"

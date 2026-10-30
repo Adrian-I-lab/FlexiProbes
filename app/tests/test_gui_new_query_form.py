@@ -18,12 +18,6 @@ pytestmark = pytest.mark.skipif(
 )
 
 
-@pytest.fixture(scope="module")
-def qapp():
-    from PySide6.QtWidgets import QApplication
-    return QApplication.instance() or QApplication([])
-
-
 def _dialog(qapp, tmp_path, **kwargs):
     # Point all stores at a temp dir so the test never touches ~/.flexprobe.
     os.environ["FLEXPROBE_HOME"] = str(tmp_path)

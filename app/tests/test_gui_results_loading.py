@@ -153,13 +153,6 @@ qt = pytest.mark.skipif(
 )
 
 
-@pytest.fixture(scope="module")
-def qapp():
-    from PySide6.QtWidgets import QApplication
-    app = QApplication.instance() or QApplication([])
-    yield app
-
-
 @qt
 def test_run_data_worker_parses_off_the_main_thread(qapp, clean_cache, tmp_path):
     """The load must not happen on the UI thread. Asserted by capturing the

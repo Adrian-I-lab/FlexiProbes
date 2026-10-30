@@ -19,13 +19,6 @@ pytestmark = pytest.mark.skipif(
 LONG_PATH = "/path/to/" + "very_long_folder_name_" * 8 + "run"
 
 
-@pytest.fixture(scope="module")
-def qapp():
-    from PySide6.QtWidgets import QApplication
-    app = QApplication.instance() or QApplication([])
-    yield app
-
-
 @pytest.fixture()
 def win(qapp, tmp_path, monkeypatch):
     monkeypatch.setenv("FLEXPROBE_HOME", str(tmp_path))

@@ -47,13 +47,6 @@ _NON_DEFAULT_TILE_STEP = 7
 
 
 @pytest.fixture(scope="module")
-def qapp():
-    from PySide6.QtWidgets import QApplication
-    app = QApplication.instance() or QApplication([])
-    yield app
-
-
-@pytest.fixture(scope="module")
 def run_templates(tmp_path_factory):
     """Three finished desktop runs, ``{"alpha", "beta", "gamma"}`` -> folder.
 

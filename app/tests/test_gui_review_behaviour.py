@@ -34,13 +34,6 @@ pytestmark = pytest.mark.skipif(
 )
 
 
-@pytest.fixture(scope="module")
-def qapp():
-    from PySide6.QtWidgets import QApplication
-    app = QApplication.instance() or QApplication([])
-    yield app
-
-
 # --- run-directory builders -------------------------------------------------
 
 _ROW_DEFAULTS = {

@@ -24,13 +24,6 @@ pytestmark = pytest.mark.skipif(
 )
 
 
-@pytest.fixture(scope="module")
-def qapp():
-    from PySide6.QtWidgets import QApplication
-    app = QApplication.instance() or QApplication([])
-    yield app
-
-
 # --- fixtures ---------------------------------------------------------------
 
 def _write_run(out_dir, rows, params):
