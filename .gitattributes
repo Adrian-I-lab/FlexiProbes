@@ -1,0 +1,7 @@
+# Vendored MAFFT. The official all-in-one packages ship a shell driver
+# (mafft.bat) whose line endings must stay LF: upstream's Windows page says
+# "Make sure to keep LF". Git's end-of-line conversion would rewrite it to CRLF
+# on a Windows checkout and break the driver, and would corrupt the helper
+# executables outright. Treat the whole vendored tree as binary so nothing in
+# it is ever normalised.
+app/packaging/vendor/mafft/** -text

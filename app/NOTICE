@@ -1,0 +1,168 @@
+flexiprobes
+Copyright (C) 2026 Adrian Ilich and contributors
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version. See the LICENSE file for the full text.
+
+================================================================================
+WHY GPL: COPYLEFT CHAIN
+================================================================================
+flexiprobes imports primer3-py for optional melting-temperature / hairpin
+scoring. primer3-py — and the libprimer3 C code it compiles in — is licensed
+GPLv2-or-later. Under that copyleft, the combined, distributed work must itself
+be GPL. We therefore release flexiprobes under GPL-3.0-or-later, which is
+compatible with primer3 (usable under v3) and with PySide6's GPL-3.0 option.
+
+================================================================================
+THIRD-PARTY COMPONENTS
+================================================================================
+This software depends on, and (in binary distributions) bundles, the following
+third-party components. Each remains under its own license; see
+THIRD-PARTY-LICENSES/ for the full texts and a per-component map. In the desktop
+binaries these legal files ship inside the bundle under licenses/ (LICENSE,
+NOTICE, THIRD-PARTY-LICENSES/).
+
+"Bundled" below means the component is redistributed as compiled code inside the
+desktop binaries. The others are ordinary runtime dependencies that pip installs
+into the user's own environment. Pinned versions are in constraints.txt.
+
+  Component        Version floor   Bundled  License
+  ---------------  --------------  -------  -----------------------------------
+  primer3-py       >=2.0           yes      GPL-2.0-or-later (incl. vendored
+                                            libprimer3)
+  PySide6 (Qt)     >=6.5           yes      LGPL-3.0 / GPL-2.0 / GPL-3.0
+                                            (tri-licensed; see below)
+  shiboken6        >=6.5           yes      LGPL-3.0 / GPL-2.0 / GPL-3.0
+                                            (PySide6's binding runtime)
+  Biopython        >=1.81          yes      Biopython License Agreement
+                                            (BSD-style)
+  NumPy            >=1.24          yes      BSD-3-Clause
+  NCBI BLAST+      2.17.0          yes      Public domain (see below)
+  MAFFT            7.526           yes      BSD (see THIRD-PARTY-LICENSES/
+                                            mafft-BSD.txt)
+  MSYS2 tools      (per component) Windows  GPL-3.0 / LGPL / BSD / MIT / zlib;
+                                   only     see THIRD-PARTY-LICENSES/
+                                            msys2-README.txt
+  openpyxl         >=3.1           no       MIT
+  et-xmlfile       (transitive)    no       MIT  (openpyxl dependency)
+
+  openpyxl is imported lazily and degrades gracefully, so PyInstaller does not
+  detect it: the frozen desktop app writes CSV but not XLSX.
+
+PySide6 / Qt — which license option is in force, and what follows:
+  Qt and PySide6 are offered under any of LGPL-3.0, GPL-2.0 or GPL-3.0.
+  flexiprobes takes them under the **GPL-3.0 option**, because the combined work
+  is already GPL-3.0-or-later (forced by primer3-py's GPLv2-or-later copyleft,
+  above). Under the GPL-3.0 option, LGPL-3.0 §4's requirement that the end user
+  be able to relink or replace the Qt libraries does NOT apply to us. The
+  obligation that does apply is GPLv3's: convey the Corresponding Source for the
+  whole work — satisfied by SOURCE-OFFER.txt and the public repository.
+
+  The binaries are built as PyInstaller "onedir" (not "onefile") anyway, as a
+  deliberate belt-and-braces choice rather than an obligation: it leaves the Qt
+  shared libraries as separate, replaceable files on disk, so the LGPL-3.0
+  option stays genuinely exercisable by any downstream re-user who prefers it,
+  and it keeps the bundled licenses/ folder visible to the end user instead of
+  sealed inside a self-extracting blob.
+
+  Full texts: GPL-3.0 in LICENSE (the option in force); LGPL-3.0 in
+  THIRD-PARTY-LICENSES/qt-pyside6-LGPL-3.0.txt. Qt source is available from
+  The Qt Company (https://download.qt.io/); PySide6 source from PyPI.
+
+NCBI BLAST+ (blastn / makeblastdb), version 2.17.0:
+  BUNDLED in the desktop binaries (macOS arm64, Windows x64, Linux x64) so the
+  app needs no separate install; invoked via subprocess at run time. BLAST+ is a
+  work of the U.S. Government and is in the PUBLIC DOMAIN — freely redistributable
+  with no license obligation (full notice: THIRD-PARTY-LICENSES/
+  PUBLIC-DOMAIN-NCBI-BLAST.txt, also packaging/vendor/blast/LICENSE.ncbi-blast).
+  Being public domain, it imposes no copyleft and is compatible with this app's
+  GPL-3.0 distribution. Please cite Camacho et al. (below) in research.
+  PRIVACY: NCBI BLAST+ sends anonymous usage statistics to ncbi.nlm.nih.gov by
+  default. flexiprobes runs it with reporting DISABLED (BLAST_USAGE_REPORT=false,
+  NCBI_USAGE_REPORT_ENABLED=false), so the app makes no outbound network call.
+  Export BLAST_USAGE_REPORT=true before launch if you wish to re-enable it.
+
+================================================================================
+ACADEMIC CITATIONS (please cite when using flexiprobes in research)
+================================================================================
+  Primer3   — Untergasser A. et al. "Primer3 — new capabilities and
+              interfaces." Nucleic Acids Res. 2012;40(15):e115.
+  Biopython — Cock P.J.A. et al. "Biopython: freely available Python tools for
+              computational molecular biology and bioinformatics."
+              Bioinformatics. 2009;25(11):1422–1423.
+  BLAST+    — Camacho C. et al. "BLAST+: architecture and applications."
+              BMC Bioinformatics. 2009;10:421.
+
+================================================================================
+10x GENOMICS — DISCLAIMER, TRADEMARKS, AND ATTRIBUTION
+================================================================================
+This is an INDEPENDENT, UNOFFICIAL tool. It is NOT affiliated with, endorsed
+by, sponsored by, or supported by 10x Genomics, Inc.
+
+"10x Genomics", "Flex", "Visium", "Cell Ranger", and "Chromium" are trademarks
+or registered trademarks of 10x Genomics, Inc. They are used here solely
+descriptively, to indicate compatibility (nominative fair use). No endorsement
+or affiliation is implied.
+
+Chemistry constants (oligo handles, barcodes, junction rules, lengths) are
+reproduced for interoperability and validation from publicly distributed 10x
+Genomics technical notes:
+  - CG000621 Rev D
+  - CG000839 Rev A  (the EGFP worked example in Tables 4 & 5 is used as a
+                     correctness oracle in the test suite)
+These constants are provided "as is" for research use, may change with 10x
+revisions, and you must verify them against the current official technical note
+before ordering reagents.
+
+NO PATENT RIGHTS ARE GRANTED. The Flex / probe-hybridization chemistry may be
+covered by patents held by 10x Genomics or others. This software's open-source
+license grants no patent rights from any third party. Users are solely
+responsible for obtaining any patent licenses required for their use,
+particularly commercial or clinical use.
+
+================================================================================
+INTEGRATED DNA TECHNOLOGIES (IDT) — DISCLAIMER, TRADEMARKS, AND ATTRIBUTION
+================================================================================
+This is an INDEPENDENT, UNOFFICIAL tool. It is NOT affiliated with, endorsed
+by, sponsored by, or supported by Integrated DNA Technologies, Inc. (IDT), or
+by its parent Danaher Corporation.
+
+"Integrated DNA Technologies", "IDT" and "oPools" are trademarks or registered
+trademarks of Integrated DNA Technologies, Inc. They are used here solely
+descriptively, to indicate that flexiprobes can emit an order file in the
+layout IDT's oPools Oligo Pools ordering process accepts (nominative fair use).
+No endorsement or affiliation is implied. The names also appear in generated
+output filenames (e.g. `*_idt_opools.csv`) and in the module that writes them
+(`flexprobe/writers/idt_opools.py`) for the same descriptive reason.
+
+The oPools order layout (column names, pool-name and sequence conventions) is
+reproduced for interoperability from IDT's publicly documented bulk-input
+format. It is provided "as is" for research use, may change without notice, and
+YOU MUST VERIFY the generated file against IDT's current ordering requirements
+before submitting an order. flexiprobes does not transmit anything to IDT: it
+writes a file locally, which you upload yourself.
+
+No commercial relationship, reseller arrangement, or quality guarantee is
+implied by the presence of this export. flexiprobes supports the IDT oPools
+layout because it is a common way to order pooled oligos; other vendors'
+formats can be produced from the same results table.
+
+================================================================================
+PRIVACY / NETWORK ACCESS
+================================================================================
+flexiprobes runs fully offline. It collects no analytics and makes no network
+connection of its own. The one third-party component capable of network access
+is the bundled NCBI BLAST+, whose default usage-statistics reporting the app
+explicitly disables (see the NCBI BLAST+ note above). BLAST databases and input
+FASTAs you supply are read locally; nothing is uploaded.
+
+================================================================================
+NO WARRANTY
+================================================================================
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. It is research software and is NOT a medical device and not
+validated for diagnostic or clinical use. See the GNU General Public License
+for more details.

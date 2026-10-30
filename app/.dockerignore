@@ -1,0 +1,14 @@
+# Build context for packaging/container/Dockerfile (run from app/).
+# Allow-list: send only what the Dockerfile COPYs. Without this, docker build
+# also uploads the macOS and Windows vendored binaries (~350 MB) it never uses.
+*
+!pyproject.toml
+!README.md
+!constraints.txt
+!src
+!packaging/vendor/blast/linux-x64
+!packaging/vendor/mafft/linux-x64
+!packaging/container/write_build_id.py
+**/__pycache__
+**/*.pyc
+**/.DS_Store

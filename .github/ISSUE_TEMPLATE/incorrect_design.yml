@@ -1,0 +1,79 @@
+name: Incorrect probe design
+description: The tool ran fine, but the probes it designed look wrong.
+labels: ["bug", "scientific-correctness"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        These are the highest-priority issues in this project — a wrong probe
+        can cost a user real money in synthesised oligos. Please be as concrete
+        as you can.
+
+        If you are unsure whether the behaviour is wrong or just unexpected,
+        open it anyway. "Turns out that's intended, and here's why" is a
+        perfectly good outcome and usually improves the documentation.
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What should the tool have done, and why?
+      description: >-
+        Cite the source if you can — the 10x technical note and revision
+        (e.g. CG000621 Rev D p.3), a published panel, or your own data. Quoting
+        the relevant sentence in full is very helpful; several past defects in
+        this tool came from a specification sentence being read truncated.
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: What did it do instead?
+      description: >-
+        Paste the relevant rows of `results.csv` (or the order file), including
+        the filter/specificity status columns.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which part of the design does this concern?
+      options:
+        - Filter funnel (GC, Tm, homopolymer, N bases)
+        - TN ligation junction
+        - Off-target / BLAST specificity screening
+        - Ranking and probe selection
+        - Chemistry constants (handles, barcodes, lengths)
+        - Order-file export (IDT oPools / Cell Ranger)
+        - Homology / consensus mode
+        - Isoform or gene-aware handling
+        - Not sure
+    validations:
+      required: true
+
+  - type: input
+    id: chemistry
+    attributes:
+      label: Chemistry
+      placeholder: "Flex v1 / Flex v2 / Visium spatial"
+    validations:
+      required: true
+
+  - type: textarea
+    id: manifest
+    attributes:
+      label: manifest.json
+      description: >-
+        Essential here — it records every threshold actually in force for the
+        run, which determines whether this is a bug or a settings question.
+      render: json
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: flexiprobes version
+    validations:
+      required: true

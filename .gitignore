@@ -1,0 +1,53 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+.venv/
+venv/
+env/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Build outputs. Release binaries are attached to the GitHub Release.
+build/
+dist/
+*.app/
+.venv-build/
+/dist.zip
+*.tar
+*.tar.gz
+*.tgz
+*.sif
+
+# Run outputs and generated BLAST database sidecars
+flexiprobe_outputs/
+results/
+*.nhr
+*.nin
+*.nsq
+*.ndb
+*.njs
+*.nog
+*.nos
+*.not
+*.ntf
+*.nto
+*.nal
+
+# Cached k-mer indexes
+*.k12.pos.npy
+*.k12.off.npy
+*.k12.meta.json
+
+# Editor and OS files
+.DS_Store
+*.swp
+.idea/
+.vscode/
+.env
+~$*
+.claude/

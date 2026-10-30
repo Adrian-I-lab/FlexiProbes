@@ -1,0 +1,657 @@
+name: CI
+
+# Run the test suite, type-checker and linter on every push / PR across the
+# supported Python range. Mirrors the local dev workflow so regressions are
+# caught before merge.
+#
+# Tags are included so that pushing v* runs the gates, produces the release
+# binaries AND publishes them. The build-* jobs compile on every run but only
+# UPLOAD on a tag (see the Upload artifact steps — that gating is what keeps
+# the 500 MB artifact storage allowance from filling), and the `release` job at
+# the bottom turns a tag's artifacts into a GitHub Release with checksums, so
+# `git push --tags` is the whole publication path.
+#
+# Job map:
+#   test      matrix gates (pytest + coverage floor, pyflakes, mypy) across
+#             the supported Python range
+#   lockfile  installs constraints.txt and checks it is internally consistent,
+#             then runs the suite and the licence-vendoring check against the
+#             pinned versions a release is actually built from
+#   build-*   one binary per platform, each verified for what PyInstaller
+#             really collected before it is archived
+#   release   tags only: downloads the three archives, writes SHA256SUMS,
+#             creates the GitHub Release
+
+on:
+  push:
+    branches: [main, master]
+    tags: ["v*"]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # The floor is 3.11 because constraints.txt pins packages (numpy among
+        # them) that declare `Requires-Python: >=3.11`. The same floor is set in
+        # pyproject.toml's requires-python, its classifiers, and
+        # [tool.mypy] python_version. Keep those four in step with this list.
+        python-version: ["3.11", "3.12"]
+    steps:
+      # fetch-depth: 0 is load-bearing here, not tidiness.
+      #
+      # test_released_version_is_immutable.py asks git whether a tag exists for
+      # the CURRENT __version__, and whether the tree has diverged from it
+      # under app/src. actions/checkout defaults to a shallow clone with NO
+      # TAGS. In that clone the test finds no tag, has nothing to compare
+      # against, and passes without checking anything.
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      # PySide6 wheels bundle Qt itself but link against system graphics and
+      # xcb libraries, which the ubuntu runner image does not ship. Without
+      # these, `import PySide6.QtWidgets` raises
+      # "libEGL.so.1: cannot open shared object file" and every GUI test errors
+      # out — and it does so *past* the `pytest.importorskip("PySide6")` guard,
+      # because the top-level package imports fine and only the Qt submodules
+      # fail. Offscreen rendering does not avoid this: the platform plugin is
+      # still a Qt GUI plugin.
+      - name: Install Qt system libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libegl1 libgl1 libxkbcommon-x11-0 libdbus-1-3 libxcb-cursor0 \
+            libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 \
+            libxcb-render-util0 libxcb-shape0 libxcb-xinerama0 libxcb-xfixes0
+
+      # BLAST+ is not the default off-target engine (the k-mer screen is), but
+      # it is the supported FALLBACK, for a reference larger than the k-mer
+      # index can address. Without it here the BLAST path is untested in
+      # automation: the real-blastn resume and end-to-end tests skip, and the
+      # run stays green while the fallback breaks.
+      - name: Install BLAST+ (exercises the fallback engine)
+        run: |
+          sudo apt-get install -y --no-install-recommends ncbi-blast+
+          blastn -version
+
+      # DELIBERATELY UNPINNED, apart from primer3-py. This job installs the
+      # flexible ranges on purpose, to catch dependency drift. See the
+      # `lockfile` job's comment. primer3-py is the one exception because
+      # tests/golden/baseline.json is keyed on its version (py3.11+primer3-X),
+      # so an upstream bump lands as "no golden block recorded for ...", a
+      # missing baseline, not an output change. It would fail the golden tests,
+      # skip every build-* job via `needs: test`, and block a release. Pinning
+      # every dependency here would avoid that only by deleting the drift
+      # detector. Bump this ONLY together with constraints.txt and a recorded
+      # baseline block for the new version, never on its own.
+      - name: Install (core + GUI + dev)
+        working-directory: app
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[gui,dev]" "primer3-py==2.3.1"
+
+      - name: Lint (pyflakes)
+        working-directory: app
+        run: python -m pyflakes src/flexprobe src/flexprobe_gui
+
+      # Only on the leg whose interpreter matches `python_version` in
+      # pyproject.toml. mypy's target version is set there, not by the
+      # interpreter it runs under, so the other legs would re-check the same
+      # target (no extra coverage) while reading the *installed* stubs, which
+      # are version-specific. Newer numpy stubs, for example, use PEP 695
+      # `type` statements, which a pre-3.12 target rejects outright ("Type
+      # statement is only supported in Python 3.12 and greater"). Bump this
+      # alongside `python_version`.
+      - name: Type-check (mypy)
+        if: matrix.python-version == '3.11'
+        working-directory: app
+        run: python -m mypy
+
+      - name: Tests (headless GUI via offscreen platform)
+        working-directory: app
+        env:
+          QT_QPA_PLATFORM: offscreen
+          # The golden byte-for-byte gate is OFF on the 3.12 leg.
+          # app/tests/golden/baseline.json only holds a
+          # `py3.11+primer3-2.3.1` block, and digests are not comparable across
+          # interpreters (Tm comes from primer3, float formatting from the
+          # interpreter), so 3.12 has nothing to compare against.
+          #
+          # A missing baseline FAILS by default, so a leg cannot report green
+          # having byte-compared nothing. This env var is a deliberate,
+          # visible, single-leg opt-out.
+          #
+          # To turn the gate on for 3.12: on a machine with Python 3.12 and
+          # primer3-py 2.3.1, run
+          #   cd app && FLEXPROBE_UPDATE_GOLDEN=1 python3.12 -m pytest \
+          #       tests/test_golden_output.py
+          # commit the merged app/tests/golden/baseline.json, and delete this
+          # env var. Do not copy the 3.11 block across by hand. A fabricated
+          # baseline gates nothing and hides a real float-formatting change.
+          FLEXPROBE_GOLDEN_OPTIONAL: ${{ matrix.python-version == '3.12' && '1' || '0' }}
+        # Coverage. The floor is a measured value rounded down, not an
+        # aspiration: line coverage over src/flexprobe + src/flexprobe_gui on
+        # Python 3.11, rounded down to 80%. The small headroom is deliberate.
+        # The point is to catch a slide, not to be a target. RAISE it when the
+        # measured number moves up. Never lower it to make a red build pass.
+        # A deleted test or a module that stopped being exercised is exactly
+        # what this is here to report.
+        #
+        # Measured on the default (non-slow) selection, which is what runs
+        # here; the `-m slow` step below is a handful of oracle tests and is
+        # deliberately left un-instrumented (it would measure ~nothing and
+        # trip the floor).
+        run: >-
+          python -m pytest -q
+          --cov=src/flexprobe
+          --cov=src/flexprobe_gui
+          --cov-report=term-missing:skip-covered
+          --cov-fail-under=80
+
+      # `-m 'not slow'` in addopts (pyproject.toml) deselects these from the
+      # step above. They are the exhaustive ground-truth oracle tests — the
+      # only check that compares the specificity screen against ground truth
+      # rather than against itself (see the `slow` marker's comment in
+      # pyproject.toml). They take seconds, so there is no reason to leave
+      # them out of CI.
+      - name: Tests (slow — exhaustive ground-truth oracle)
+        working-directory: app
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: python -m pytest -q -m slow
+
+
+  lockfile:
+    # constraints.txt is documented as the way to "reproduce a release build".
+    # A lockfile nobody installs is a claim, not a lock, so this job installs
+    # it on the declared floor interpreter.
+    #
+    # It is also the ONLY place `vendor_licenses.py --check` can run honestly:
+    # that script rebuilds each vendored licence text from the *installed*
+    # distribution and stamps the version into the file header, so in the `test`
+    # job above — which installs the flexible ranges on purpose, to catch dep
+    # drift — every text would read "stale" the first time a dependency
+    # released a patch. Pinned environment, meaningful check.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # The declared floor. If constraints.txt ever again pins something this
+      # interpreter cannot install, the pip step below fails here rather than
+      # in a user's terminal.
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      # Same Qt runtime libraries as the test job — see the comment there.
+      - name: Install Qt system libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libegl1 libgl1 libxkbcommon-x11-0 libdbus-1-3 libxcb-cursor0 \
+            libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 \
+            libxcb-render-util0 libxcb-shape0 libxcb-xinerama0 libxcb-xfixes0
+
+      - name: Install BLAST+ (exercises the fallback engine)
+        run: |
+          sudo apt-get install -y --no-install-recommends ncbi-blast+
+          blastn -version
+
+      - name: Install from the lockfile (-c constraints.txt)
+        working-directory: app
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[gui,dev]" -c constraints.txt
+
+      # A constraints file is advisory: pip applies a pin only to a package it
+      # actually resolves, and says nothing about one it skipped. Assert the
+      # pins took, so "installed with -c constraints.txt" means what it says.
+      - name: Assert every pin actually took
+        working-directory: app
+        run: |
+          python - <<'PY'
+          import sys
+          from importlib.metadata import PackageNotFoundError, version
+
+          pins = {}
+          for line in open("constraints.txt", encoding="utf-8"):
+              line = line.split("#", 1)[0].strip()
+              if not line:
+                  continue
+              name, _, want = line.partition("==")
+              pins[name.strip()] = want.strip()
+
+          bad = []
+          for name, want in sorted(pins.items()):
+              try:
+                  got = version(name)
+              except PackageNotFoundError:
+                  bad.append(f"{name}: pinned to {want} but NOT INSTALLED")
+                  continue
+              if got != want:
+                  bad.append(f"{name}: pinned {want}, installed {got}")
+          if bad:
+              print("constraints.txt did not take effect:", *bad, sep="\n  - ")
+              sys.exit(1)
+          print(f"OK - all {len(pins)} pins are the installed versions.")
+          PY
+
+      # The T2 regression guard, stated as an invariant rather than a comment:
+      # no pinned distribution may require a NEWER Python than the floor
+      # pyproject.toml declares. This is the exact contradiction that made the
+      # lockfile uninstallable on 3.10 while the project advertised 3.10.
+      - name: Lockfile must be installable on the declared floor
+        working-directory: app
+        run: |
+          python - <<'PY'
+          import sys, tomllib
+          from importlib.metadata import metadata
+          from packaging.specifiers import SpecifierSet
+          from packaging.version import Version
+
+          with open("pyproject.toml", "rb") as fh:
+              declared = tomllib.load(fh)["project"]["requires-python"]
+          spec = SpecifierSet(declared)
+          # Lowest release series the project claims to support.
+          floor = min(
+              (Version(s.version) for s in spec if s.operator in (">=", "==", "~=")),
+              default=None,
+          )
+          if floor is None:
+              sys.exit(f"cannot read a floor out of requires-python = {declared!r}")
+
+          pins = []
+          for line in open("constraints.txt", encoding="utf-8"):
+              line = line.split("#", 1)[0].strip()
+              if line:
+                  pins.append(line.split("==")[0].strip())
+
+          bad = []
+          for name in sorted(pins):
+              req = metadata(name).get("Requires-Python")
+              if req and Version(f"{floor.major}.{floor.minor}") not in SpecifierSet(req):
+                  bad.append(f"{name} needs Python {req}, floor is {floor}")
+          if bad:
+              print(
+                  f"constraints.txt cannot be installed on the declared floor "
+                  f"(requires-python = {declared!r}):",
+                  *bad, sep="\n  - ",
+              )
+              print(
+                  "\nRaise requires-python (and the classifiers, [tool.mypy] "
+                  "python_version and the CI matrix), or unpin.",
+              )
+              sys.exit(1)
+          print(f"OK - every pin installs on Python {floor}.")
+          PY
+
+      # Rebuilds each vendored licence text from the installed distribution
+      # and exits 1 on any missing or stale file. A dependency bump that
+      # changes a licence, or a constraints.txt bump made without re-running
+      # the vendoring script, is a red build rather than a licence-compliance
+      # defect found after the binaries ship.
+      - name: Vendored licence texts are current (vendor_licenses.py --check)
+        working-directory: app
+        run: python packaging/vendor_licenses.py --check
+
+      # Run the suite against the pinned versions too. The matrix job proves the
+      # code survives dependency drift; this proves the exact combination a
+      # release is built from actually works.
+      - name: Tests (pinned environment)
+        working-directory: app
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: python -m pytest -q
+
+  build-macos:
+    # Build the macOS .app (PyInstaller is host-specific — must run on macOS).
+    runs-on: macos-14
+    needs: test
+    # Code signing and notarisation (optional).
+    #
+    # Add these six repository secrets (Settings -> Secrets and variables ->
+    # Actions). Every signing and notarisation step below is conditional on
+    # them being non-empty, so a fork without them gets a build with no
+    # Developer ID signature rather than a red run.
+    #
+    #   MACOS_CERTIFICATE_P12       base64 of the exported "Developer ID
+    #                               Application" .p12  (`base64 -i cert.p12`)
+    #   MACOS_CERTIFICATE_PASSWORD  the .p12 export password
+    #   MACOS_SIGN_IDENTITY         "Developer ID Application: Name (TEAMID)"
+    #   APPLE_ID                    the Apple ID notarytool submits as
+    #   APPLE_TEAM_ID               the 10-character team id
+    #   APPLE_APP_PASSWORD          an APP-SPECIFIC password, not the Apple ID
+    #                               password
+    #
+    # Declared at JOB level on purpose: the `env` context is what a step's
+    # `if:` can read, and a step cannot reliably test its own step-level env.
+    # An unset secret expands to the empty string, which is what every
+    # `if: env.X != ''` below keys off.
+    #
+    # FLEXIPROBES_CODESIGN_IDENTITY is the variable packaging/build.py already
+    # defaults --sign to, so signing switches on purely by the secret
+    # existing: empty secret -> empty env -> build.py's `if args.sign:` is
+    # falsy -> no Developer ID signing. A real identity also makes build.py enable the
+    # hardened runtime, a secure timestamp and packaging/entitlements.plist,
+    # all three prerequisites for notarisation.
+    env:
+      MACOS_CERTIFICATE_P12: ${{ secrets.MACOS_CERTIFICATE_P12 }}
+      MACOS_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+      FLEXIPROBES_CODESIGN_IDENTITY: ${{ secrets.MACOS_SIGN_IDENTITY }}
+      APPLE_ID: ${{ secrets.APPLE_ID }}
+      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      # Skipped when the signing secrets are absent. See the signing note on
+      # the job above.
+      - name: Import the Developer ID certificate (skipped if not configured)
+        if: env.MACOS_CERTIFICATE_P12 != ''
+        run: |
+          # A throwaway keychain, unlocked only for this job. The password is
+          # generated here and never leaves the runner.
+          KEYCHAIN_PASSWORD="$(openssl rand -base64 24)"
+          security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+          security set-keychain-settings -t 3600 -u build.keychain
+          echo "$MACOS_CERTIFICATE_P12" | base64 --decode > /tmp/cert.p12
+          security import /tmp/cert.p12 -k build.keychain \
+            -P "$MACOS_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
+          rm -f /tmp/cert.p12
+          security set-key-partition-list -S apple-tool:,apple: \
+            -s -k "$KEYCHAIN_PASSWORD" build.keychain >/dev/null
+          security find-identity -v -p codesigning
+
+      - name: Build flexiprobes.app
+        working-directory: app
+        run: |
+          python -m pip install --upgrade pip
+          # -c constraints.txt: these three jobs produce the binaries the
+          # `release` job publishes, so they are built from the same pinned
+          # set the `lockfile` job proves installs and passes. pyinstaller
+          # is not in the file, so it resolves freely.
+          pip install -e ".[gui]" pyinstaller -c constraints.txt
+          python packaging/build.py --clean
+      # Asserts what PyInstaller ACTUALLY collected. `vendor_licenses.py
+      # --check` cannot do this, because it checks constraints.txt, not the
+      # bundle. build.py's own post-build check covers one failure (a foreign
+      # Qt5). Other bundle faults are silent: a missing p3helpers.so makes
+      # every Tm come back n/a from a build that reports success, and the spec
+      # only prints a WARNING when a vendored BLAST+ binary is absent.
+      # Read-only, no build effects.
+      - name: Verify what PyInstaller collected
+        working-directory: app
+        run: python packaging/verify_bundle.py ../dist/flexiprobes.app
+
+      # build.py canonicalises its output to the REPOSITORY-ROOT dist/, never
+      # app/dist/ (packaging/build.py: DEFAULT_DIST = REPO_ROOT / "dist"). The
+      # `working-directory: app` above applies to the build step only; the
+      # artifact lands one level up.
+      # Archive BEFORE uploading. actions/upload-artifact zips the path it is
+      # given and does not preserve the POSIX executable bit or symlinks, so
+      # uploading `dist/flexiprobes.app` directly gives a download that is not
+      # a runnable .app (the launcher, the vendored blastn and every Qt
+      # framework symlink arrive broken). `ditto -c -k --keepParent
+      # --sequesterRsrc` is Apple's own bundle-preserving archiver.
+      # Deliberately NOT tag-gated: it costs no artifact storage, and running
+      # it on every push is what keeps the release path from being first
+      # exercised on the day of a release.
+      - name: Package the .app
+        run: |
+          ditto -c -k --sequesterRsrc --keepParent \
+            dist/flexiprobes.app dist/flexiprobes-macos-arm64.zip
+          ls -l dist/flexiprobes-macos-arm64.zip
+
+      # Notarisation. Skipped entirely unless the Apple credentials exist.
+      # Submit the zip, then staple the ticket to the .app and re-zip, so the
+      # asset a user downloads carries the ticket and opens without Gatekeeper
+      # prompting — stapling the zip itself does nothing.
+      - name: Notarise and staple (skipped if not configured)
+        if: env.APPLE_ID != '' && env.APPLE_TEAM_ID != '' && env.APPLE_APP_PASSWORD != ''
+        run: |
+          xcrun notarytool submit dist/flexiprobes-macos-arm64.zip \
+            --apple-id "$APPLE_ID" \
+            --team-id "$APPLE_TEAM_ID" \
+            --password "$APPLE_APP_PASSWORD" \
+            --wait
+          xcrun stapler staple dist/flexiprobes.app
+          rm -f dist/flexiprobes-macos-arm64.zip
+          ditto -c -k --sequesterRsrc --keepParent \
+            dist/flexiprobes.app dist/flexiprobes-macos-arm64.zip
+          xcrun stapler validate dist/flexiprobes.app
+
+      # Tags only. One run's binaries are ~480 MB across the three platforms,
+      # close to a 500 MB artifact storage allowance. Uploading on every push
+      # would fill it, and then every build job would fail at upload. The
+      # build above still runs on every push, so a compile break is caught.
+      # Only the storage-consuming step is gated.
+      - name: Upload artifact
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: actions/upload-artifact@v4
+        with:
+          name: flexiprobes-macos-arm64
+          path: dist/flexiprobes-macos-arm64.zip
+          if-no-files-found: error
+          retention-days: 14
+
+  build-windows:
+    # Build the Windows binary (onedir flexiprobes/ with flexiprobes.exe). PyInstaller
+    # can't cross-compile, so this must run on a Windows host.
+    runs-on: windows-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Build flexiprobes.exe
+        working-directory: app
+        run: |
+          python -m pip install --upgrade pip
+          # -c constraints.txt: these three jobs produce the binaries the
+          # `release` job publishes, so they are built from the same pinned
+          # set the `lockfile` job proves installs and passes. pyinstaller
+          # is not in the file, so it resolves freely.
+          pip install -e ".[gui]" pyinstaller -c constraints.txt
+          python packaging/build.py --clean
+      # Asserts what PyInstaller ACTUALLY collected. `vendor_licenses.py
+      # --check` cannot do this, because it checks constraints.txt, not the
+      # bundle. build.py's own post-build check covers one failure (a foreign
+      # Qt5). Other bundle faults are silent: a missing p3helpers.so makes
+      # every Tm come back n/a from a build that reports success, and the spec
+      # only prints a WARNING when a vendored BLAST+ binary is absent.
+      # Read-only, no build effects.
+      - name: Verify what PyInstaller collected
+        working-directory: app
+        run: python packaging/verify_bundle.py ../dist/flexiprobes
+
+      # build.py canonicalises its output to the REPOSITORY-ROOT dist/, never
+      # app/dist/ (packaging/build.py: DEFAULT_DIST = REPO_ROOT / "dist"). The
+      # `working-directory: app` above applies to the build step only; the
+      # artifact lands one level up.
+      # See the macOS packaging note: upload-artifact re-zips a directory and
+      # drops permissions, so archive first and upload one file. 7-Zip ships
+      # with the windows runner image and is an order of magnitude faster than
+      # Compress-Archive over a few hundred files (that cmdlet is the fallback
+      # if the image ever stops carrying 7z).
+      - name: Package the onedir bundle
+        shell: bash
+        run: |
+          7z a -tzip -mx=7 dist/flexiprobes-windows-x64.zip ./dist/flexiprobes
+          ls -l dist/flexiprobes-windows-x64.zip
+
+      # Tags only — see the note on the macOS upload step.
+      - name: Upload artifact
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: actions/upload-artifact@v4
+        with:
+          name: flexiprobes-windows-x64
+          path: dist/flexiprobes-windows-x64.zip
+          if-no-files-found: error
+          retention-days: 14
+
+  build-linux:
+    # Build the Linux binary (onedir flexiprobes/ with the flexiprobes launcher).
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Build flexiprobes (Linux)
+        working-directory: app
+        run: |
+          python -m pip install --upgrade pip
+          # -c constraints.txt: these three jobs produce the binaries the
+          # `release` job publishes, so they are built from the same pinned
+          # set the `lockfile` job proves installs and passes. pyinstaller
+          # is not in the file, so it resolves freely.
+          pip install -e ".[gui]" pyinstaller -c constraints.txt
+          python packaging/build.py --clean
+      # Asserts what PyInstaller ACTUALLY collected. `vendor_licenses.py
+      # --check` cannot do this, because it checks constraints.txt, not the
+      # bundle. build.py's own post-build check covers one failure (a foreign
+      # Qt5). Other bundle faults are silent: a missing p3helpers.so makes
+      # every Tm come back n/a from a build that reports success, and the spec
+      # only prints a WARNING when a vendored BLAST+ binary is absent.
+      # Read-only, no build effects.
+      - name: Verify what PyInstaller collected
+        working-directory: app
+        run: python packaging/verify_bundle.py ../dist/flexiprobes
+
+      # build.py canonicalises its output to the REPOSITORY-ROOT dist/, never
+      # app/dist/ (packaging/build.py: DEFAULT_DIST = REPO_ROOT / "dist"). The
+      # `working-directory: app` above applies to the build step only; the
+      # artifact lands one level up.
+      # tar, not zip: the Linux onedir bundle contains executables and symlinks
+      # (the launcher, the vendored blastn, Qt's versioned .so links) and both
+      # zip and upload-artifact lose them. See the macOS packaging note.
+      - name: Package the onedir bundle
+        run: |
+          tar -C dist -czf dist/flexiprobes-linux-x64.tar.gz flexiprobes
+          ls -l dist/flexiprobes-linux-x64.tar.gz
+
+      # Tags only — see the note on the macOS upload step.
+      - name: Upload artifact
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: actions/upload-artifact@v4
+        with:
+          name: flexiprobes-linux-x64
+          path: dist/flexiprobes-linux-x64.tar.gz
+          if-no-files-found: error
+          retention-days: 14
+
+  release:
+    # Turns a tag into a GitHub Release.
+    #
+    # A GitHub artifact needs a logged-in account to download and expires
+    # after `retention-days: 14`. A Release gives a permanent URL, an
+    # anonymous download, and a checksum file. The build jobs' artifacts are
+    # the hand-off into it.
+    name: Publish the GitHub Release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [test, lockfile, build-macos, build-windows, build-linux]
+    runs-on: ubuntu-latest
+    permissions:
+      # Least privilege: the default GITHUB_TOKEN is read-only for contents,
+      # and creating a release needs write. Nothing else is granted, and this
+      # is the only job in the workflow with any write permission at all.
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Full history + tags, so `gh release create --verify-tag` and
+          # --generate-notes can see the tag and the commits since the last one.
+          fetch-depth: 0
+
+      - name: Download the built binaries
+        uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+          # Each build job uploads exactly one archive; flatten them into one
+          # directory rather than one subdirectory per artifact name.
+          merge-multiple: true
+
+      # Checksums, written the way `shasum -a 256 -c SHA256SUMS` expects: bare
+      # filenames, one per line, sorted, and the file itself excluded from its
+      # own listing. Users run it to confirm the binary they downloaded is the
+      # one that was released.
+      - name: Compute SHA256SUMS
+        working-directory: release-assets
+        run: |
+          set -euo pipefail
+          : > SHA256SUMS
+          for f in $(ls -1 | grep -v '^SHA256SUMS$' | sort); do
+            shasum -a 256 "$f" >> SHA256SUMS
+          done
+          echo "--- SHA256SUMS ---"
+          cat SHA256SUMS
+          # Prove the file we are about to publish actually verifies.
+          shasum -a 256 -c SHA256SUMS
+          # A release with no binaries in it is a failure, not an empty success.
+          test "$(wc -l < SHA256SUMS)" -ge 3
+
+      # NOT a third-party action. This is the one job holding
+      # `contents: write`, and a third-party action's git TAG is mutable, so
+      # `@v2` re-points at whatever its author (or someone who compromises
+      # that account) pushes next. `gh` is preinstalled on every
+      # GitHub-hosted runner and is first-party, so it removes the dependency
+      # rather than pinning it. The actions/* steps above keep floating major
+      # tags for the same reason: they are first-party, owned by the same org
+      # as the runner.
+      #
+      # --verify-tag  refuses to publish for a tag that does not exist.
+      # --generate-notes  writes the commit list; edit the release afterwards
+      #                   to put a summary of user-visible changes on top.
+      # A pre-release tag (v1.0.0-rc1) is marked as such automatically.
+      - name: Create the release and attach the assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          PRERELEASE=""
+          case "$TAG" in
+            *-*) PRERELEASE="--prerelease" ;;
+          esac
+          # Deliberately not idempotent: `gh release create` fails if the
+          # release already exists, rather than silently replacing published
+          # assets that someone may already have downloaded and checksummed.
+          gh release create "$TAG" \
+            --title "flexiprobes $TAG" \
+            --verify-tag \
+            --generate-notes \
+            $PRERELEASE \
+            release-assets/*
+          gh release view "$TAG" --json assets \
+            --jq '.assets[] | "\(.name)  \(.size) bytes"'
+
+      # Not wired: a detached OpenPGP signature over SHA256SUMS. The
+      # checksums above protect against a corrupted download. A signature
+      # would also protect against a replaced one. To add it, store a
+      # GPG_PRIVATE_KEY secret, import it, run
+      # `gpg --detach-sign --armor SHA256SUMS`, and attach SHA256SUMS.asc,
+      # conditional on the secret like the macOS signing steps above.
+

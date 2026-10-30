@@ -1,0 +1,10 @@
+# TEMPLATE — single-gene / standard mode (Flex v1, Flex v2, Visium).
+# One record per gene. The sequence is the sense-strand mRNA/cDNA you want
+# probes designed against (typically the CDS). Replace the placeholder below
+# with your real sequence. Lines starting with '#' are comments — flexprobe
+# ignores them, so you can leave these notes in or delete them.
+>YOUR_GENE_ID  optional free-text description
+ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT
+ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT
+>ANOTHER_GENE  you can put many genes in one file
+ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT

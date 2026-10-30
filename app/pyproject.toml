@@ -1,0 +1,99 @@
+[build-system]
+# setuptools>=77 supports PEP 639 (SPDX `license` string + `license-files`).
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "flexiprobes"
+version = "1.0.0"
+description = "flexiprobes — Flex / Visium probe design app (core engine + CLI + PySide6 GUI)"
+readme = "README.md"
+# 3.11 is the floor because the reproducible-install lockfile
+# (./constraints.txt) pins releases (numpy among them) that declare
+# `Requires-Python: >=3.11`. The declared floor matches what is actually
+# installable and tested.
+# Keep this in step with: the classifiers below, [tool.mypy] python_version,
+# the CI matrix in .github/workflows/ci.yml, and constraints.txt's header.
+requires-python = ">=3.11"
+authors = [{ name = "Adrian Ilich" }]
+# GPL-3.0-or-later is required: primer3-py (imported for Tm/hairpin scoring)
+# is GPLv2-or-later copyleft, which forces a GPL license on the combined work.
+# v3-or-later is compatible with primer3 (usable under v3) and with PySide6's
+# GPL-3.0 option. See NOTICE for the full third-party license breakdown.
+license = "GPL-3.0-or-later"
+license-files = ["LICENSE", "NOTICE"]
+keywords = ["bioinformatics", "probe-design", "10x-genomics", "flex", "visium", "spatial-transcriptomics"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
+# Upper bounds guard against breaking major releases (numpy 2.x is
+# already out). The exact tested versions are pinned in ./constraints.txt — the
+# reproducible-install lockfile: `pip install -e ".[gui]" -c constraints.txt`.
+# The CI test matrix installs the flexible ranges below (so it catches dep drift
+# across 3.11–3.12); a separate CI job installs WITH `-c constraints.txt`, so
+# the lockfile is exercised rather than merely asserted.
+dependencies = [
+    "biopython>=1.81,<2",
+    "numpy>=1.24,<3",
+    "openpyxl>=3.1,<4",
+    "primer3-py>=2.0,<3",
+]
+
+[project.optional-dependencies]
+gui = ["PySide6>=6.5,<7"]
+dev = ["pytest>=7", "pytest-cov", "mypy>=1.8", "pyflakes>=3"]
+
+[project.scripts]
+flexiprobes = "flexprobe.cli:main"
+# Back-compat aliases for the previous command names.
+flexprobe = "flexprobe.cli:main"
+flex-probe-design = "flexprobe.cli:main"
+
+[project.gui-scripts]
+flexiprobes-gui = "flexprobe_gui.app:main"
+flexprobe-gui = "flexprobe_gui.app:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["flexprobe*", "flexprobe_gui*"]
+
+[tool.setuptools.package-data]
+flexprobe = ["py.typed"]
+flexprobe_gui = ["assets/*.png"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# `slow` marks the exhaustive-oracle checks: they build a q-gram index over a
+# reference and verify every candidate offset by full-length comparison, which
+# is far slower than the rest of the suite but is the only check that compares
+# the specificity screen against ground truth rather than against itself.
+# Deselected by default (`-m "not slow"` below); CI and anyone touching the
+# specificity path should run `pytest -m slow`.
+markers = [
+    "slow: exhaustive correctness oracle; deselected by default",
+]
+addopts = "-m 'not slow'"
+
+[tool.mypy]
+# Covers BOTH the core library and the GUI package.
+# Must track `requires-python` above: mypy checks against THIS version, not the
+# interpreter it runs under.
+python_version = "3.11"
+files = ["src/flexprobe", "src/flexprobe_gui"]
+ignore_missing_imports = true   # primer3, Bio, PySide6 ship no/partial stubs
+warn_unused_ignores = true
+no_implicit_optional = true
+
+[[tool.mypy.overrides]]
+# Qt's dynamic enum/attribute access (e.g. QMessageBox.Yes, Qt.ItemIsEditable)
+# is invisible to mypy and yields only false positives. Silence that one class
+# of noise for the GUI while keeping every real check (assignment, arg-type,
+# union-attr, return-value) enabled.
+module = "flexprobe_gui.*"
+disable_error_code = ["attr-defined"]

@@ -1,0 +1,14 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Question about how to use flexiprobes
+    url: https://github.com/Adrian-I-lab/FlexiProbes/discussions
+    about: >-
+      Usage questions are best asked in Discussions. Please check README.md and
+      app/README.md first — the specificity gates and their defaults are
+      documented there.
+  - name: Security vulnerability
+    url: https://github.com/Adrian-I-lab/FlexiProbes/security/advisories/new
+    about: >-
+      Report privately, not as a public issue. Note that an
+      incorrectly designed probe is NOT a security issue — use the "Incorrect
+      probe design" template for that.
