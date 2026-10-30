@@ -1,0 +1,289 @@
+PACKAGE_NAME: blast
+PACKAGE_VERSION: 2.17.0
+PACKAGE_SIGNATURE: MSVC_1700-ReleaseDLLMT--i386-pc-x64-MSCOREMAKE307
+PACKAGE_CONFIG: Win64_22 : plain : vs2022 static 64 ReleaseDLL
+
+>>>>>  blastp.exe
+
+blastp: 2.17.0+
+ Package: blast 2.17.0, build Jul  1 2025 08:57:20
+ Package-Config:  vs2022 static 64 ReleaseDLL
+ Build-Signature:  MSVC_1700-ReleaseDLLMT--i386-pc-x64-MSCOREMAKE307
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 08:57:20
+
+
+
+>>>>>  blastn.exe
+
+blastn: 2.17.0+
+ Package: blast 2.17.0, build Jul  1 2025 08:57:20
+ Package-Config:  vs2022 static 64 ReleaseDLL
+ Build-Signature:  MSVC_1700-ReleaseDLLMT--i386-pc-x64-MSCOREMAKE307
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 08:57:20
+
+
+
+>>>>>  blastx.exe
+
+blastx: 2.17.0+
+ Package: blast 2.17.0, build Jul  1 2025 08:57:20
+ Package-Config:  vs2022 static 64 ReleaseDLL
+ Build-Signature:  MSVC_1700-ReleaseDLLMT--i386-pc-x64-MSCOREMAKE307
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 08:57:20
+
+
+
+>>>>>  tblastn.exe
+
+tblastn: 2.17.0+
+ Package: blast 2.17.0, build Jul  1 2025 08:57:20
+ Package-Config:  vs2022 static 64 ReleaseDLL
+ Build-Signature:  MSVC_1700-ReleaseDLLMT--i386-pc-x64-MSCOREMAKE307
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 08:57:20
+
+
+
+>>>>>  tblastx.exe
+
+tblastx: 2.17.0+
+ Package: blast 2.17.0, build Jul  1 2025 08:57:20
+ Package-Config:  vs2022 static 64 ReleaseDLL
+ Build-Signature:  MSVC_1700-ReleaseDLLMT--i386-pc-x64-MSCOREMAKE307
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 08:57:20
+
+
+
+>>>>>  psiblast.exe
+
+psiblast: 2.17.0+
+ Package: blast 2.17.0, build Jul  1 2025 08:57:20
+ Package-Config:  vs2022 static 64 ReleaseDLL
+ Build-Signature:  MSVC_1700-ReleaseDLLMT--i386-pc-x64-MSCOREMAKE307
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 08:57:20
+
+
+
+>>>>>  rpsblast.exe
+
+rpsblast: 2.17.0+
+ Package: blast 2.17.0, build Jul  1 2025 08:57:20
+ Package-Config:  vs2022 static 64 ReleaseDLL
+ Build-Signature:  MSVC_1700-ReleaseDLLMT--i386-pc-x64-MSCOREMAKE307
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 08:57:20
+
+
+
+>>>>>  rpstblastn.exe
+
+rpstblastn: 2.17.0+
+ Package: blast 2.17.0, build Jul  1 2025 08:57:20
+ Package-Config:  vs2022 static 64 ReleaseDLL
+ Build-Signature:  MSVC_1700-ReleaseDLLMT--i386-pc-x64-MSCOREMAKE307
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 08:57:20
+
+
+
+>>>>>  makembindex.exe
+
+makembindex: 2.17.0
+ Package: blast 2.17.0, build Jul  1 2025 08:57:20
+ Package-Config:  vs2022 static 64 ReleaseDLL
+ Build-Signature:  MSVC_1700-ReleaseDLLMT--i386-pc-x64-MSCOREMAKE307
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 08:57:20
+
+ NCBI C++ Toolkit: 29.0.0
+   Build-Date:  Jul  1 2025 08:56:53
+   Stable-Components-Version:  29
+   Production-Version:  20250122
+
+
+
+
+>>>>>  segmasker.exe
+
+segmasker: 1.0.0
+ Package: blast 2.17.0, build Jul  1 2025 08:57:20
+ Package-Config:  vs2022 static 64 ReleaseDLL
+ Build-Signature:  MSVC_1700-ReleaseDLLMT--i386-pc-x64-MSCOREMAKE307
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 08:57:20
+
+
+
+>>>>>  dustmasker.exe
+
+dustmasker: 1.0.0
+ Package: blast 2.17.0, build Jul  1 2025 08:57:20
+ Package-Config:  vs2022 static 64 ReleaseDLL
+ Build-Signature:  MSVC_1700-ReleaseDLLMT--i386-pc-x64-MSCOREMAKE307
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 08:57:20
+
+
+
+>>>>>  windowmasker.exe
+
+windowmasker: 1.0.0
+ Package: blast 2.17.0, build Jul  1 2025 08:57:20
+ Package-Config:  vs2022 static 64 ReleaseDLL
+ Build-Signature:  MSVC_1700-ReleaseDLLMT--i386-pc-x64-MSCOREMAKE307
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 08:57:20
+
+ window-masker-algorithm:1.0.0
+
+ windowmasker-statistics-algorithm-version:1.0.0
+
+ windowmasker-statistics-format-version:ascii 1.1.0
+
+ windowmasker-statistics-format-version:binary 1.1.0
+
+ windowmasker-statistics-format-version:oascii 1.1.0
+
+ windowmasker-statistics-format-version:obinary 1.1.0
+
+
+
+>>>>>  deltablast.exe
+
+deltablast: 2.17.0+
+ Package: blast 2.17.0, build Jul  1 2025 08:57:20
+ Package-Config:  vs2022 static 64 ReleaseDLL
+ Build-Signature:  MSVC_1700-ReleaseDLLMT--i386-pc-x64-MSCOREMAKE307
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 08:57:20
+
+
+
+>>>>>  makeblastdb.exe
+
+makeblastdb: 2.17.0+
+ Package: blast 2.17.0, build Jul  1 2025 08:57:20
+ Package-Config:  vs2022 static 64 ReleaseDLL
+ Build-Signature:  MSVC_1700-ReleaseDLLMT--i386-pc-x64-MSCOREMAKE307
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 08:57:20
+
+
+
+>>>>>  blastdbcmd.exe
+
+blastdbcmd: 2.17.0+
+ Package: blast 2.17.0, build Jul  1 2025 08:57:20
+ Package-Config:  vs2022 static 64 ReleaseDLL
+ Build-Signature:  MSVC_1700-ReleaseDLLMT--i386-pc-x64-MSCOREMAKE307
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 08:57:20
+
+
+
+>>>>>  blastdb_aliastool.exe
+
+blastdb_aliastool: 2.17.0+
+ Package: blast 2.17.0, build Jul  1 2025 08:57:20
+ Package-Config:  vs2022 static 64 ReleaseDLL
+ Build-Signature:  MSVC_1700-ReleaseDLLMT--i386-pc-x64-MSCOREMAKE307
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 08:57:20
+
+
+
+>>>>>  convert2blastmask.exe
+
+convert2blastmask: 2.17.0+
+ Package: blast 2.17.0, build Jul  1 2025 08:57:20
+ Package-Config:  vs2022 static 64 ReleaseDLL
+ Build-Signature:  MSVC_1700-ReleaseDLLMT--i386-pc-x64-MSCOREMAKE307
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 08:57:20
+
+
+
+>>>>>  blastdbcheck.exe
+
+blastdbcheck: 2.17.0+
+ Package: blast 2.17.0, build Jul  1 2025 08:57:20
+ Package-Config:  vs2022 static 64 ReleaseDLL
+ Build-Signature:  MSVC_1700-ReleaseDLLMT--i386-pc-x64-MSCOREMAKE307
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 08:57:20
+
+
+
+>>>>>  makeprofiledb.exe
+
+makeprofiledb: 2.17.0+
+ Package: blast 2.17.0, build Jul  1 2025 08:57:20
+ Package-Config:  vs2022 static 64 ReleaseDLL
+ Build-Signature:  MSVC_1700-ReleaseDLLMT--i386-pc-x64-MSCOREMAKE307
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 08:57:20
+
+
+
+>>>>>  blast_formatter.exe
+
+blast_formatter: 2.17.0+
+ Package: blast 2.17.0, build Jul  1 2025 08:57:20
+ Package-Config:  vs2022 static 64 ReleaseDLL
+ Build-Signature:  MSVC_1700-ReleaseDLLMT--i386-pc-x64-MSCOREMAKE307
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 08:57:20
+
+
+
+>>>>>  blastn_vdb.exe
+
+blastn_vdb: 2.17.0+
+ncbi-vdb: 3.2.1
+ Package: blast 2.17.0, build Jul  1 2025 08:57:20
+ Package-Config:  vs2022 static 64 ReleaseDLL
+ Build-Signature:  MSVC_1700-ReleaseDLLMT--i386-pc-x64-MSCOREMAKE307
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 08:57:20
+
+
+
+>>>>>  tblastn_vdb.exe
+
+tblastn_vdb: 2.17.0+
+ncbi-vdb: 3.2.1
+ Package: blast 2.17.0, build Jul  1 2025 08:57:20
+ Package-Config:  vs2022 static 64 ReleaseDLL
+ Build-Signature:  MSVC_1700-ReleaseDLLMT--i386-pc-x64-MSCOREMAKE307
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 08:57:20
+
+
+
+>>>>>  blast_formatter_vdb.exe
+
+blast_formatter_vdb: 2.17.0+
+ Package: blast 2.17.0, build Jul  1 2025 08:57:20
+ Package-Config:  vs2022 static 64 ReleaseDLL
+ Build-Signature:  MSVC_1700-ReleaseDLLMT--i386-pc-x64-MSCOREMAKE307
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 08:57:20
+
+
+
+>>>>>  blast_vdb_cmd.exe
+
+blast_vdb_cmd: 2.17.0+
+ Package: blast 2.17.0, build Jul  1 2025 08:57:20
+ Package-Config:  vs2022 static 64 ReleaseDLL
+ Build-Signature:  MSVC_1700-ReleaseDLLMT--i386-pc-x64-MSCOREMAKE307
+ GI-64bit:  TRUE
+ Build-Date:  Jul  1 2025 08:57:20
+
+
+
