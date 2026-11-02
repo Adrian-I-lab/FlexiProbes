@@ -18,4 +18,4 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 """flexprobe – pure-Python probe design library."""
-__version__ = "1.0.0"
+__version__ = "1.0.1"

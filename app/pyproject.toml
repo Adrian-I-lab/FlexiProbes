@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "flexiprobes"
-version = "1.0.0"
+version = "1.0.1"
 description = "flexiprobes — Flex / Visium probe design app (core engine + CLI + PySide6 GUI)"
 readme = "README.md"
 # 3.11 is the floor because the reproducible-install lockfile
