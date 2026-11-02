@@ -40,6 +40,7 @@ from __future__ import annotations
 
 import logging
 import os
+from dataclasses import asdict
 from typing import Optional
 
 from PySide6.QtCore import Qt
@@ -60,7 +61,7 @@ from flexprobe.constants import (
 from flexprobe.models import (
     FilterThresholds, RunConfig, ScreenResources, SpecificityThresholds,
 )
-from flexprobe.ranking import DEFAULT_WEIGHTS
+from flexprobe.ranking import DEFAULT_ISOFORM_COVERAGE_WEIGHT, DEFAULT_WEIGHTS
 from flexprobe.screen import ENGINE_BLAST, ENGINE_KMER
 
 from .modality import DEFAULT_MODALITY, MODALITY_DEFAULTS, MODALITY_PRESETS
@@ -976,22 +977,26 @@ class NewQueryDialog(DraftMixin, BuildMixin, QDialog):
         self.ranking_box = box
         form = QFormLayout(box)
         self._ranking_spins = {}
-        # (key, label, default) — defaults mirror RankingWeights.
-        for key, label, default in [
-            ("gc_proximity", "GC proximity", 0.25),
-            ("gc_balance", "GC balance", 0.15),
-            ("specificity_margin", "Specificity margin", 0.30),
-            ("homopolymer_penalty", "Homopolymer penalty", 0.15),
-            ("central_placement", "Central placement", 0.15),
-            ("isoform_coverage", "Isoform coverage", 0.20),
-            ("mismatch_placement", "Mismatch placement",
-             DEFAULT_WEIGHTS.mismatch_placement),
+        # Defaults are read from the engine, never typed here: a typed copy
+        # went stale once already. The isoform spin is live only under gene
+        # grouping, where the engine weights that term at
+        # DEFAULT_ISOFORM_COVERAGE_WEIGHT rather than RankingWeights' 0.0.
+        defaults = {**asdict(DEFAULT_WEIGHTS),
+                    "isoform_coverage": DEFAULT_ISOFORM_COVERAGE_WEIGHT}
+        for key, label in [
+            ("gc_proximity", "GC proximity"),
+            ("gc_balance", "GC balance"),
+            ("specificity_margin", "Specificity margin"),
+            ("homopolymer_penalty", "Homopolymer penalty"),
+            ("central_placement", "Central placement"),
+            ("isoform_coverage", "Isoform coverage"),
+            ("mismatch_placement", "Mismatch placement"),
         ]:
             sp = QDoubleSpinBox()
             sp.setRange(0.0, 1.0)
             sp.setSingleStep(0.05)
             sp.setDecimals(2)
-            sp.setValue(default)
+            sp.setValue(defaults[key])
             self._ranking_spins[key] = sp
             form.addRow(f"{label}:", sp)
         # Isoform coverage only differentiates probes in gene-aware mode (every

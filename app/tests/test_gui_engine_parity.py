@@ -226,6 +226,53 @@ def test_engine_warning_appears_only_off_the_default_engine(dialog):
     assert "rank-comparable" in dialog.engine_warning.text()
 
 
+# --- ranking weights: the advanced box must open on the engine's weights ----
+
+def _effective_weights(cfg, gene_aware):
+    """The weights the engine scores with, merged the way pipeline.py does."""
+    from flexprobe.ranking import (
+        DEFAULT_ISOFORM_COVERAGE_WEIGHT, DEFAULT_WEIGHTS, RankingWeights,
+    )
+    weights = RankingWeights(**{**dataclasses.asdict(DEFAULT_WEIGHTS),
+                                **(cfg.ranking_weights or {})})
+    if gene_aware and "isoform_coverage" not in (cfg.ranking_weights or {}):
+        weights = dataclasses.replace(
+            weights, isoform_coverage=DEFAULT_ISOFORM_COVERAGE_WEIGHT)
+    return weights
+
+
+def test_ranking_spins_open_on_engine_defaults(dialog):
+    """A typed-in copy of the weights went stale once already.
+
+    The box showed 0.25 / 0.15 / 0.30 / 0.15 / 0.15 after the engine moved to
+    the fitted 0.35 / 0.34 / 0.28 / 0.03 / 0.00, so a user who ticked it and
+    changed nothing silently ranked with retired weights.
+    """
+    from flexprobe.ranking import (
+        DEFAULT_ISOFORM_COVERAGE_WEIGHT, DEFAULT_WEIGHTS, RankingWeights,
+    )
+    fields = {f.name for f in dataclasses.fields(RankingWeights)}
+    # Every engine weight has a spin, so a new term cannot be left out.
+    assert set(dialog._ranking_spins) == fields
+    expected = {f: getattr(DEFAULT_WEIGHTS, f) for f in fields}
+    # The isoform spin is live only under gene grouping, where the engine
+    # weights the term at DEFAULT_ISOFORM_COVERAGE_WEIGHT.
+    expected["isoform_coverage"] = DEFAULT_ISOFORM_COVERAGE_WEIGHT
+    shown = {k: sp.value() for k, sp in dialog._ranking_spins.items()}
+    assert shown == pytest.approx(expected)
+
+
+@pytest.mark.parametrize("gene_aware", [False, True])
+def test_ticking_ranking_box_without_edits_changes_nothing(dialog, gene_aware):
+    dialog.group_by_gene.setChecked(gene_aware)
+    _rec, untouched, _cached = dialog.build_runs()[0]
+    dialog.ranking_box.setChecked(True)
+    _rec, ticked, _cached = dialog.build_runs()[0]
+    assert ticked.ranking_weights is not None
+    assert (_effective_weights(ticked, gene_aware)
+            == _effective_weights(untouched, gene_aware))
+
+
 # --- HPC export: the dialog and the engine must agree on the defaults -------
 
 def test_hpc_dialog_opens_on_the_engine_chain_defaults(qapp, tmp_path):
