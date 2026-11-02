@@ -8,8 +8,8 @@ abstract: >-
   oPool / Cell Ranger exports, and HPC export/import for memory-heavy
   whole-transcriptome workflows.
 type: software
-version: "1.0.0"
-date-released: "2026-10-30"
+version: "1.0.1"
+date-released: "2026-11-02"
 license: GPL-3.0-or-later
 repository-code: "https://github.com/Adrian-I-lab/FlexiProbes"
 url: "https://github.com/Adrian-I-lab/FlexiProbes"

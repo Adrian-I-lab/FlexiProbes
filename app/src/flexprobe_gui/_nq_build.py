@@ -589,8 +589,12 @@ class BuildMixin(_HostBase):
             line.strip() for line in self.extra_on_target.toPlainText().splitlines()
             if line.strip()
         ]
+        # A disabled spin is not the user's choice. The isoform spin is
+        # disabled off gene grouping, where every probe has coverage 1.0, so
+        # sending its value would add a constant term the engine leaves out.
         ranking_weights = (
-            {k: float(sp.value()) for k, sp in self._ranking_spins.items()}
+            {k: float(sp.value()) for k, sp in self._ranking_spins.items()
+             if sp.isEnabled()}
             if self.ranking_box.isChecked() else None
         )
         project_id = self.project_combo.currentData() or ""
